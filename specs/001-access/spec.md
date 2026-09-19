@@ -1,4 +1,4 @@
-# specs/001-Access/spec.md
+# specs/001-access/spec.md
 # Feature: เข้าใช้บริการห้องสมุด (Library Access)
 Spec ID: SPEC-LIB-001 | Source: SRS (NFR-PERF-01, NFR-SEC-01/02, NFR-USE-01, NFR-AVL-01) | Use case: UC-01
 Owner: ทีม A | Status: Draft v1 | Updated: 2569-09-09
