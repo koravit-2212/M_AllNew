@@ -1,7 +1,7 @@
 # specs/011-manageBook/spec.md
 # Feature: จัดการข้อมูลหนังสือ/บริการ (Catalog Management)
 Spec ID: SPEC-CAT-001 | Source: Use Case Specification ระบบห้องสมุด, UC-11 | Use case: UC-11
-Owner: TBD | Status: Draft v1 | Updated: 2569-09-19
+Owner: TBD | Status: Draft v2 | Updated: 2569-09-20
 
 ## Goal
 บรรณารักษ์/เจ้าหน้าที่เพิ่ม แก้ไข หรือลบข้อมูลหนังสือและบริการต่าง ๆ โดยระบบตรวจสอบความถูกต้อง
@@ -45,8 +45,9 @@ Owner: TBD | Status: Draft v1 | Updated: 2569-09-19
 
 ## Assumptions & Open Questions
 - ASM-01 สิทธิ์การเพิ่ม/แก้ไข/ลบข้อมูลหนังสือจำกัดเฉพาะบรรณารักษ์และเจ้าหน้าที่ห้องสมุดที่ได้รับมอบหมาย
-- Q-01 การลบข้อมูลหนังสือเป็นการลบถาวรหรือ soft delete (เพื่อรักษาประวัติการยืม-คืนที่อ้างอิงหนังสือเล่มนั้น)? -> ถามฝ่าย IT/บรรณารักษ์
-- Q-02 "รูปแบบข้อมูลไม่ถูกต้อง" ครอบคลุมเงื่อนไขใดบ้าง (ฟิลด์บังคับ/รูปแบบ ISBN ฯลฯ)? -> ถามบรรณารักษ์
+- ASM-02 การลบข้อมูลหนังสือใช้ Soft Delete: ซ่อนรายการจากผลการค้นหาโดยไม่ลบข้อมูลจริง โดยบันทึก `is_deleted` (หรือ `status = Inactive/Archived`), `deleted_at` (ISO 8601), และ `deleted_by` (actor id)
+- ASM-03 กฎการตรวจสอบรูปแบบข้อมูล (validation) เบื้องต้น: `title` (required), `resource_type` (required), `call_number` (required); หากกรอก `ISBN` ต้องผ่านรูปแบบ ISBN-10 หรือ ISBN-13 regex; วันที่ต้องเป็นรูปแบบ ISO 8601 (`YYYY-MM-DD`)
+- Q-01 การลบถาวร vs soft delete ถูกตอบแล้ว (ASM-02) และ Q-02 เกี่ยวกับรูปแบบข้อมูลถูกตอบแล้ว (ASM-03)
 
 ## Traceability
 | SRS | spec.md | AC |

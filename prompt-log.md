@@ -446,4 +446,57 @@
 - เพิ่ม `ASM-02` เพื่อบันทึกคำตัดสินใจของทีม
 
 
+---
+
+## 2026-09-20 20:50 คำสั่ง: /clarify (specs/011-manageBook)
+
+- เครื่องมือ: Copilot ใน Codespaces
+- ไฟล์: specs/011-manageBook/spec.md (v1 -> v2)
+
+### คำถามที่ AI ถาม (ทั้งหมด)
+
+1. การลบข้อมูลหนังสือต้องเป็นการลบถาวรหรือ soft delete? (Q1)
+2. ฟิลด์บังคับและรูปแบบข้อมูล (เช่น ISBN, วันที่) ควรกำหนดอย่างไร? (Q2)
+
+### คำตอบของทีมและเหตุผล
+
+1. A1: การลบต้องเป็น Soft Delete; บันทึก `is_deleted` (หรือ `status = Inactive/Archived`), `deleted_at` (ISO 8601), และ `deleted_by` (actor id); ซ่อนจากผลการค้นหาแต่ไม่กระทบประวัติการยืม
+2. A2: ฟิลด์บังคับอย่างน้อย `Title`, `Resource Type`, `Call Number`; ถ้ามี `ISBN` ต้องผ่านรูปแบบ ISBN-10 หรือ ISBN-13; วันที่ใช้ ISO 8601 (`YYYY-MM-DD`)
+
+### สิ่งที่แก้ใน spec.md (v1 -> v2)
+
+- เปลี่ยน `Status` เป็น Draft v2 และอัปเดตวันที่เป็น 2569-09-20
+- เพิ่ม `ASM-02` บันทึกพฤติกรรม Soft Delete และฟิลด์ metadata ที่ต้องเก็บ (`is_deleted`/`status`, `deleted_at`, `deleted_by`)
+- เพิ่ม `ASM-03` บันทึกกฎการตรวจสอบรูปแบบข้อมูล: `title`, `resource_type`, `call_number` เป็น required; `ISBN` ต้องผ่าน ISBN-10/13 regex; วันที่ต้องเป็น ISO 8601
+- ย้าย/ลบ Q-01 และ Q-02 เพราะได้รับคำตอบแล้ว
+
+### Files modified
+
+- [specs/011-manageBook/spec.md](specs/011-manageBook/spec.md)
+
+### Notes / Next questions
+
+- โปรดตรวจสอบว่าต้องการใช้ชื่อตัวแปร/ฟิลด์จริงเป็น `is_deleted` / `deleted_at` / `deleted_by` หรือชื่ออื่น และยืนยัน regex ที่จะใช้สำหรับ ISBN (ISBN-10/13 standard) เพื่อผมจะอัปเดต spec ให้ตรงกัน
+---
+
+## 2026-09-20 21:05 คำสั่ง: /plan (specs/011-manageBook)
+
+- เครื่องมือ: Copilot ใน Codespaces
+- ไฟล์: specs/011-manageBook/plan.md (สร้างจาก spec.md)
+
+### ผลลัพธ์
+
+1. สร้างไฟล์ `specs/011-manageBook/plan.md` ซึ่งประกอบด้วย: สรุปแนวทาง, เทคโนโลยีที่เลือก, โมเดลข้อมูล, API/หน้าจอ, ตารางตรวจ Constraints, แผนทดสอบจาก AC, ลำดับงาน และรายการ Open Questions
+2. ใช้ ASM-02/ASM-03 ที่บันทึกใน `spec.md` เพื่อกำหนด soft delete และ validation rules
+3. ไม่มี Open Questions ค้างใน `spec.md` ณ ปัจจุบัน
+
+### Files modified
+
+- [specs/011-manageBook/plan.md](specs/011-manageBook/plan.md)
+
+### Next steps
+
+- โปรดตรวจสอบและอนุมัติ plan; หากต้องการผมจะเพิ่มตัวอย่าง regex สำหรับ ISBN หรือเปลี่ยนชื่อฟิลด์ตามที่ทีมต้องการ
+
+
 
