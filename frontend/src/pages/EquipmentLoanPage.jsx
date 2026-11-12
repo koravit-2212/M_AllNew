@@ -16,6 +16,7 @@ export default function EquipmentLoanPage({ client = api }) {
   const [selectedId, setSelectedId] = useState(null)
   const [submitted, setSubmitted] = useState(null)
   const [submitting, setSubmitting] = useState(false)
+  const [submitRejected, setSubmitRejected] = useState(false)
 
   // FR-EQP-01: โหลดรายการประเภทอุปกรณ์ และนักศึกษาตัวอย่าง (ชั่วคราวจนกว่าจะมีล็อกอิน) เมื่อเข้าหน้า
   useEffect(() => {
@@ -60,7 +61,16 @@ export default function EquipmentLoanPage({ client = api }) {
       })
       setSubmitted({ name: selectedItem.name, quantity: request?.quantity ?? REQUEST_QUANTITY })
     } catch {
+      // FR-EQP-05 (T-15): หลังบ้านปฏิเสธ เช่น อุปกรณ์หมดระหว่างที่เปิดหน้าค้างไว้ ต้องแจ้งว่าไม่สามารถยืมได้
+      // แล้วโหลดจำนวนคงเหลือใหม่ ให้เห็นสถานะล่าสุด
       setSubmitted(null)
+      setSubmitRejected(true)
+      try {
+        const payload = await client.listEquipmentTypes()
+        setItems(payload?.items ?? [])
+      } catch {
+        // คงรายการเดิมไว้ถ้าโหลดใหม่ไม่สำเร็จ
+      }
     } finally {
       setSubmitting(false)
     }
@@ -118,7 +128,10 @@ export default function EquipmentLoanPage({ client = api }) {
               <li key={item.equipment_type_id}>
                 <button
                   type="button"
-                  onClick={() => setSelectedId(item.equipment_type_id)}
+                  onClick={() => {
+                    setSelectedId(item.equipment_type_id)
+                    setSubmitRejected(false)
+                  }}
                   aria-pressed={selected}
                   className={`flex w-full items-center justify-between gap-3 rounded-xl px-4 py-3 text-left transition ${
                     selected ? 'border-2 border-teal-700 bg-teal-50' : 'border border-slate-200 bg-white hover:bg-slate-50'
@@ -143,6 +156,10 @@ export default function EquipmentLoanPage({ client = api }) {
           <div className="mt-3 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800" role="alert">
             <b className="block text-base">ไม่สามารถยืมได้</b>
             {selectedItem.name}หมดแล้ว กรุณาเลือกอุปกรณ์อื่น
+          </div>
+        ) : submitRejected ? (
+          <div className="mt-3 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800" role="alert">
+            <b className="block text-base">ไม่สามารถยืมได้</b>
           </div>
         ) : (
           <p className="mt-3 text-xs text-slate-500">เจ้าหน้าที่จะตรวจสอบและอนุมัติคำขอก่อนยืมเสมอ</p>
