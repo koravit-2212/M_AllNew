@@ -1030,3 +1030,12 @@
 - ไฟล์ที่แตะ: `backend/app/config.py` (`EQUIPMENT_MAX_QUANTITY_PER_REQUEST = 1`, คอมเมนต์ `LIBRARY_TIMEZONE` อ้าง Q-12), `backend/app/services/equipment_service.py`, `backend/tests/test_AC_EQP_03_quantity_limit.py`, `frontend/src/config.js` (ใหม่), `frontend/src/pages/EquipmentLoanPage.jsx`
 - ขอเกินจำนวนสูงสุดต่อคำขอ ตอบ 409 "ไม่สามารถยืมได้" (ตรวจหลังเช็กคงเหลือ เพื่อให้ TC-EQP-03-2 ยังได้ผลเดิม)
 - ผล test: หลังบ้าน 45 passed, หน้าจอ 30 passed
+
+## 2026-11-12 /verify specs/007-equipment (รอบ 2 หลัง T-16, T-17)
+
+- ผล test: 75 ผ่าน 0 ไม่ผ่าน (pytest 45, vitest 30)
+- ตารางไปข้างหน้า 8 แถว: ครบ 5 (FR-EQP-01..05), ยังไม่ถึง 0, รอ 0, ช่องโหว่ 3 (FR-EQP-06 และ CON-LNS-02 จาก F-01, NFR-USB-01 จาก F-06)
+- แก้แล้ว: F-02 (T-16), F-03 (plan), F-04 (T-17), F-05 (Q-12) ย้ายไปหัวข้อ "แก้แล้ว"
+- ยังเปิดอยู่: F-01 (Q-09 รอ 005), F-06 (TC-EQP-NFR-1 รอทีมลองบนมือถือ) ช่อง "ทีมตัดสิน" AI เขียนแทนตามคำสั่ง "ตัดสินใจเองทั้งหมดได้เลย" ระบุไว้ในช่องแล้ว
+- ไม่มีข้อค้นพบใหม่
+- รอบแรกให้ FR-EQP-06 สถานะ "ครบ" ทั้งที่ F-01 อ้างถึง รอบนี้แก้เป็น "ช่องโหว่" ให้ตรงกติกา
