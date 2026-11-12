@@ -45,3 +45,28 @@ BOOK_SEARCH_SEED_DATA = [
         ],
     },
 ]
+
+
+# ---------------------------------------------------------------------------
+# 006-printing ใช้บริการปริ้นเอกสาร
+# ---------------------------------------------------------------------------
+
+# CON-FILE-01, ASM-02 รองรับเฉพาะ PDF, DOCX, PPTX, XLSX, JPG, PNG
+PRINT_ALLOWED_EXTENSIONS = ('pdf', 'docx', 'pptx', 'xlsx', 'jpg', 'png')
+
+# CON-FILE-01, ASM-02 ขนาดไฟล์ไม่เกิน 50 MB ต่อไฟล์
+PRINT_MAX_FILE_SIZE_MB = 50
+PRINT_MAX_FILE_SIZE_BYTES = PRINT_MAX_FILE_SIZE_MB * 1024 * 1024
+
+# FR-PRT-02, ASM-01, ASM-03 อัตราค่าพิมพ์ต่อหน้า (บาท): ขาว-ดำ 1 บาท สี 5 บาท
+PRINT_RATE_PER_PAGE_BAHT = {
+    'BW': 1,
+    'Color': 5,
+}
+
+# FR-PRT-05, IF-PRN-01 เครื่องพิมพ์ตัวอย่าง (ทีมเลือกเอง ไม่ได้มาจาก spec)
+# status: 'ready' = พร้อมใช้งาน, 'offline' / 'error' = ไม่พร้อมใช้งาน
+PRINTER_SEED_DATA = [
+    {'printer_id': 'PRN-LIB-01', 'status': 'ready'},
+]
+PRINTER_READY_STATUS = 'ready'

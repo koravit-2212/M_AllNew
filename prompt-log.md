@@ -823,3 +823,9 @@
 - ผลลัพธ์: สร้าง `specs/006-printing/tasks.md` 5 เฟส 10 task ไม่มี task รอ Q-xx
 - ข้อเสนอคำถามให้ทีม: (1) การหักโควตา SU-IT ตาม ASM-04 ไม่มี FR และขัดกับ Out of scope เรื่องการชำระเงิน (2) จำนวนหน้าให้ผู้ใช้กรอกเอง (3) เพดานหน้าต่อเทอมใน ASM-03 ไม่มี FR
 - ทางเทคนิค: ใช้ข้อมูลในหน่วยความจำและ spooler จำลอง (ทีมเลือกเอง ไม่ได้มาจาก spec) และ spec ไม่มีหมวด "หน้าจอ (UI)"
+
+## 2026-11-12 คำสั่ง: /implement-all specs/006-printing/tasks.md เฟส 0 — T-01
+
+- task: T-01 กำหนดค่าการพิมพ์ใน config และสร้างที่เก็บงานพิมพ์กับ spooler จำลอง
+- ไฟล์ที่แตะ: `backend/app/config.py`, `backend/app/models/printing.py`, `backend/tests/test_PRT_T01_print_store.py`
+- ผล test: หลังบ้าน 10 passed, หน้าจอ 7 passed
