@@ -1,6 +1,7 @@
 // T-04 (FR-EQP-01, NFR-USB-01) ตรวจด้วย AC-EQP-01
 // T-07 (FR-EQP-02, ASM-01, NFR-USB-01) ตรวจด้วย AC-EQP-02
 // T-10 (FR-EQP-05, NFR-USB-01) ตรวจด้วย AC-EQP-03
+// T-16 (FR-EQP-05, Q-10) ตรวจด้วย AC-EQP-03
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { vi } from 'vitest'
 
@@ -102,5 +103,30 @@ describe('AC-EQP-03 อุปกรณ์หมด', () => {
     fireEvent.click(screen.getByRole('button', { name: /อุปกรณ์ทดสอบ 1/ }))
     expect(screen.queryByText('ไม่สามารถยืมได้')).toBeNull()
     expect(submit.disabled).toBe(false)
+  })
+})
+
+describe('AC-EQP-03 แยกข้อความเมื่อส่งคำขอไม่สำเร็จ (T-16, Q-10)', () => {
+  async function submitWith(error) {
+    const client = makeClient([{ equipment_type_id: 'A', name: 'อุปกรณ์ทดสอบ 1', available_count: 1 }])
+    client.createLoanRequest = vi.fn().mockRejectedValue(error)
+    render(<EquipmentLoanPage client={client} />)
+    await screen.findByText('อุปกรณ์ทดสอบ 1')
+    await screen.findByRole('option', { name: /นักศึกษาทดสอบ 1/ })
+    fireEvent.click(screen.getByRole('button', { name: /อุปกรณ์ทดสอบ 1/ }))
+    fireEvent.click(screen.getByRole('button', { name: 'ส่งคำขอยืม' }))
+    await waitFor(() => expect(client.createLoanRequest).toHaveBeenCalled())
+  }
+
+  it('AC-EQP-03 หลังบ้านตอบ 409 แสดงไม่สามารถยืมได้', async () => {
+    await submitWith(Object.assign(new Error('Loan request failed: 409'), { status: 409 }))
+    expect(await screen.findByText('ไม่สามารถยืมได้')).toBeTruthy()
+    expect(screen.queryByText('ส่งคำขอไม่สำเร็จ กรุณาลองใหม่')).toBeNull()
+  })
+
+  it('AC-EQP-03 เหตุอื่น (เช่น เน็ตหลุด) แสดงส่งคำขอไม่สำเร็จ ไม่ใช่ไม่สามารถยืมได้', async () => {
+    await submitWith(new TypeError('Failed to fetch'))
+    expect(await screen.findByText('ส่งคำขอไม่สำเร็จ กรุณาลองใหม่')).toBeTruthy()
+    expect(screen.queryByText('ไม่สามารถยืมได้')).toBeNull()
   })
 })

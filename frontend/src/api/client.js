@@ -3,6 +3,13 @@
 // เรียกผ่าน /api (ดู proxy ใน vite.config.js) หลังบ้านต้องรันอยู่ที่ port 8000
 const BASE = import.meta.env.VITE_API_BASE ?? '/api'
 
+// FR-EQP-05, Q-10: อ่าน HTTP status จาก error ที่ client โยน (มี .status หรือข้อความ "... failed: <status>")
+export function getErrorStatus(error) {
+  if (typeof error?.status === 'number') return error.status
+  const match = String(error?.message ?? '').match(/failed: (\d{3})/)
+  return match ? Number(match[1]) : null
+}
+
 export const api = {
   async searchBooks({ q, page = 1, per_page = 20 }) {
     const params = new URLSearchParams({ q, page: String(page), per_page: String(per_page) })
@@ -43,7 +50,9 @@ export const api = {
       body: JSON.stringify({ student_id: studentId, equipment_type_id: equipmentTypeId, quantity }),
     })
     if (!res.ok) {
-      throw new Error(`Loan request failed: ${res.status}`)
+      const error = new Error(`Loan request failed: ${res.status}`)
+      error.status = res.status
+      throw error
     }
     return res.json()
   },

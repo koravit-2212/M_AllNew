@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 
-import { api } from '../api/client.js'
+import { api, getErrorStatus } from '../api/client.js'
 
 // FR-EQP-01, FR-EQP-02, FR-EQP-05, ASM-01, NFR-USB-01
 // หน้ายืมอุปกรณ์ของนักศึกษา (UI-EQP-01) แสดงประเภทอุปกรณ์ให้เลือก แล้วส่งคำขอให้เจ้าหน้าที่อนุมัติ
@@ -16,7 +16,8 @@ export default function EquipmentLoanPage({ client = api }) {
   const [selectedId, setSelectedId] = useState(null)
   const [submitted, setSubmitted] = useState(null)
   const [submitting, setSubmitting] = useState(false)
-  const [submitRejected, setSubmitRejected] = useState(false)
+  // null | 'out_of_stock' (409, FR-EQP-05) | 'failed' (เหตุอื่น, Q-10)
+  const [submitError, setSubmitError] = useState(null)
 
   // FR-EQP-01: โหลดรายการประเภทอุปกรณ์ และนักศึกษาตัวอย่าง (ชั่วคราวจนกว่าจะมีล็อกอิน) เมื่อเข้าหน้า
   useEffect(() => {
@@ -60,11 +61,11 @@ export default function EquipmentLoanPage({ client = api }) {
         quantity: REQUEST_QUANTITY,
       })
       setSubmitted({ name: selectedItem.name, quantity: request?.quantity ?? REQUEST_QUANTITY })
-    } catch {
-      // FR-EQP-05 (T-15): หลังบ้านปฏิเสธ เช่น อุปกรณ์หมดระหว่างที่เปิดหน้าค้างไว้ ต้องแจ้งว่าไม่สามารถยืมได้
+    } catch (error) {
+      // FR-EQP-05 (T-15, T-16): 409 = อุปกรณ์ไม่พอ แจ้ง "ไม่สามารถยืมได้" เหตุอื่นแจ้งให้ลองใหม่ (Q-10)
       // แล้วโหลดจำนวนคงเหลือใหม่ ให้เห็นสถานะล่าสุด
       setSubmitted(null)
-      setSubmitRejected(true)
+      setSubmitError(getErrorStatus(error) === 409 ? 'out_of_stock' : 'failed')
       try {
         const payload = await client.listEquipmentTypes()
         setItems(payload?.items ?? [])
@@ -130,7 +131,7 @@ export default function EquipmentLoanPage({ client = api }) {
                   type="button"
                   onClick={() => {
                     setSelectedId(item.equipment_type_id)
-                    setSubmitRejected(false)
+                    setSubmitError(null)
                   }}
                   aria-pressed={selected}
                   className={`flex w-full items-center justify-between gap-3 rounded-xl px-4 py-3 text-left transition ${
@@ -157,9 +158,11 @@ export default function EquipmentLoanPage({ client = api }) {
             <b className="block text-base">ไม่สามารถยืมได้</b>
             {selectedItem.name}หมดแล้ว กรุณาเลือกอุปกรณ์อื่น
           </div>
-        ) : submitRejected ? (
+        ) : submitError ? (
           <div className="mt-3 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800" role="alert">
-            <b className="block text-base">ไม่สามารถยืมได้</b>
+            <b className="block text-base">
+              {submitError === 'out_of_stock' ? 'ไม่สามารถยืมได้' : 'ส่งคำขอไม่สำเร็จ กรุณาลองใหม่'}
+            </b>
           </div>
         ) : (
           <p className="mt-3 text-xs text-slate-500">เจ้าหน้าที่จะตรวจสอบและอนุมัติคำขอก่อนยืมเสมอ</p>

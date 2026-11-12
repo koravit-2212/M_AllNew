@@ -1018,3 +1018,9 @@
 
 - AI ถามการตัดสินใจของข้อค้นพบ F-01 ถึง F-06 ทีมเลือกตัวเลือกที่แนะนำทุกข้อ แล้วสั่งให้ AI ตัดสินใจเองที่เหลือทั้งหมด
 - เอกสาร: spec.md เพิ่ม Q-09 ถึง Q-12 (AI ตัดสินแทนทีม), CHANGELOG, plan.md ข้อ 4 เพิ่ม GET /api/loan-requests, GET /api/students, ตาราง "ค่าที่ตั้งได้" และขีดทิ้ง /return, test-cases.md เพิ่ม TC-EQP-NFR-1 (คน, สถานะร่าง), tasks.md เพิ่ม T-16 (F-02) และ T-17 (F-04)
+
+## 2026-11-12 /implement T-16 (rtm F-02, Q-10)
+
+- ไฟล์ที่แตะ: `frontend/src/api/client.js` (เพิ่ม `error.status` และ `getErrorStatus`), `frontend/src/pages/EquipmentLoanPage.jsx`, `frontend/src/__tests__/EquipmentLoanPage.test.jsx` (เพิ่ม 2 test ไม่แตะ TC)
+- 409 แสดง "ไม่สามารถยืมได้" เหตุอื่นแสดง "ส่งคำขอไม่สำเร็จ กรุณาลองใหม่"
+- ผล test: หลังบ้าน 43 passed, หน้าจอ 30 passed
