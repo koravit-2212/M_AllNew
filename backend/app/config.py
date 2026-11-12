@@ -45,3 +45,24 @@ BOOK_SEARCH_SEED_DATA = [
         ],
     },
 ]
+
+
+# ---------------------------------------------------------------------------
+# 007-equipment ใช้บริการยืมอุปกรณ์
+# ---------------------------------------------------------------------------
+
+# FR-EQP-01, FR-EQP-02 ประเภทอุปกรณ์ (ปลั๊กไฟ ร่ม ถุงผ้า) พร้อมจำนวนคงเหลือตัวอย่าง
+# จำนวนคงเหลือเป็นข้อมูลตัวอย่างสำหรับลองระบบ (ทีมเลือกเอง ไม่ได้มาจาก spec)
+# due date ต่อประเภท (ASM-03) ยังไม่ใส่ รอคำตอบทีม ดู T-13 ใน specs/007-equipment/tasks.md
+EQUIPMENT_SEED_DATA = [
+    {'equipment_type_id': 'EQ-PLUG', 'name': 'ปลั๊กไฟ', 'available_count': 4},
+    {'equipment_type_id': 'EQ-UMBRELLA', 'name': 'ร่ม', 'available_count': 2},
+    {'equipment_type_id': 'EQ-BAG', 'name': 'ถุงผ้า', 'available_count': 5},
+]
+
+# FR-EQP-03, FR-EQP-06, CON-LNS-02 นักศึกษาตัวอย่างและรายการค้างคืน
+# ข้อมูลจริงควรมาจาก 005-borrow-return ซึ่งยังไม่มี (ทีมเลือกเอง ไม่ได้มาจาก spec)
+EQUIPMENT_STUDENT_SEED_DATA = [
+    {'student_id': '64000001', 'name': 'นักศึกษาตัวอย่าง ก', 'outstanding_items': []},
+    {'student_id': '64000002', 'name': 'นักศึกษาตัวอย่าง ข', 'outstanding_items': [{'item': 'ร่ม', 'days_overdue': 2}]},
+]
