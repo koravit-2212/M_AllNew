@@ -845,3 +845,7 @@
   - ไฟล์ที่แตะ: `backend/app/api/spaces.py`, `backend/app/main.py`, `backend/tests/test_AC_BKG_01_available_spaces.py`
   - ผล test: หลังบ้าน 12 passed, หน้าจอ 8 passed
   - พื้นที่ที่ปิดไม่แสดง พื้นที่ "ว่าง" เมื่อมีอย่างน้อย 1 ช่วงว่าง (mockup "ว่างวันนี้" / "เต็ม")
+- T-04 แสดงรายการพื้นที่และช่วงเวลาให้เลือกในหน้าจองพื้นที่
+  - ไฟล์ที่แตะ: `frontend/src/api/client.js`, `frontend/src/pages/SpaceBookingPage.jsx`, `frontend/src/__tests__/SpaceBookingPage.test.jsx`
+  - ผล test: หลังบ้าน 12 passed, หน้าจอ 9 passed
+  - ข้อความตาม UI-BKG-01: ขั้นตอน "1 เลือกพื้นที่ / 2 ยืนยัน / 3 ผลการจอง", "พื้นที่ที่ใช้งานได้", "ว่างวันนี้" / "ไม่ว่างวันนี้", ป้าย "ว่าง" / "เต็ม", "ช่วงเวลา", รูปแบบ "09.00–11.00 น." พื้นที่และช่วงที่เต็มกดไม่ได้

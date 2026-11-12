@@ -19,6 +19,14 @@ export const api = {
     }
     return res.json()
   },
+  // FR-BKG-01: พื้นที่ที่ใช้งานได้พร้อมช่วงเวลาและสถานะว่าง (GET /api/spaces/available)
+  async listAvailableSpaces() {
+    const res = await fetch(`${BASE}/spaces/available`)
+    if (!res.ok) {
+      throw new Error(`Available spaces request failed: ${res.status}`)
+    }
+    return res.json()
+  },
   async getSlots({ dateFrom, packageCode }) {
     const q = new URLSearchParams({ date_from: dateFrom, package_code: packageCode })
     const res = await fetch(`${BASE}/slots?${q}`)
