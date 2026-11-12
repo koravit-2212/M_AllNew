@@ -1,0 +1,63 @@
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
+import { vi } from 'vitest'
+
+import SpaceBookingPage from '../pages/SpaceBookingPage.jsx'
+
+// test จาก specs/004-reserve/test-cases.md ห้ามแก้ให้ผ่าน
+function slots(prefix, bookedStarts = []) {
+  return [
+    ['09:00', '11:00'],
+    ['11:00', '13:00'],
+    ['13:00', '15:00'],
+    ['15:00', '17:00'],
+  ].map(([start, end]) => ({
+    slot_id: `${prefix}-${start}`,
+    date: '2026-11-13',
+    start_time: start,
+    end_time: end,
+    available: !bookedStarts.includes(start),
+  }))
+}
+
+function space(id, name, bookedStarts = []) {
+  const list = slots(id, bookedStarts)
+  return { space_id: id, space_type: 'โซน', facility_name: name, available: list.some((s) => s.available), slots: list }
+}
+
+const USERS = [
+  { userId: '64000001', name: 'นักศึกษาทดสอบ', userType: 'student' },
+  { userId: 'GU-0001', name: 'บุคคลภายนอกทดสอบ', userType: 'guest' },
+]
+
+function makeClient(spaces, createReservation = vi.fn().mockResolvedValue({ reservationId: 'RSV-0001', status: 'confirmed', message: 'จองสำเร็จ' })) {
+  return {
+    listAvailableSpaces: vi.fn().mockResolvedValue({ spaces }),
+    listSpaceUsers: vi.fn().mockResolvedValue({ items: USERS }),
+    createReservation,
+  }
+}
+
+async function chooseAndConfirm(client, spaceName, slotLabel, userId = '64000001') {
+  render(<SpaceBookingPage client={client} />)
+  fireEvent.click(await screen.findByRole('button', { name: new RegExp(spaceName) }))
+  await screen.findByRole('option', { name: /บุคคลภายนอกทดสอบ/ })
+  fireEvent.change(screen.getByLabelText('ผู้จอง'), { target: { value: userId } })
+  fireEvent.click(screen.getByRole('button', { name: new RegExp(slotLabel) }))
+  fireEvent.click(screen.getByRole('button', { name: 'ถัดไป' }))
+  fireEvent.click(screen.getByRole('button', { name: 'ยืนยันการจอง' }))
+}
+
+test('test_TC_BKG_03_1_booked_slot_rejected_no_duplicate', async () => {
+  // Given ช่วง 11.00–13.00 น. ถูกจองไปแล้ว (หน้าจอยังเห็นว่าง แต่หลังบ้านตอบ 409)
+  const client = makeClient([space('A', 'พื้นที่ ก')], vi.fn().mockRejectedValue(Object.assign(new Error('Reservation failed: 409'), { status: 409 })))
+
+  // When นักศึกษาอีกคนพยายามจองพื้นที่และช่วงเวลาเดียวกัน
+  await chooseAndConfirm(client, 'พื้นที่ ก', '11\\.00–13\\.00 น\\.')
+
+  // Then (3) หน้าจอแสดงข้อความพื้นที่ไม่ว่าง และมีปุ่มกลับไปเลือกพื้นที่หรือเวลาใหม่
+  expect(await screen.findByText('พื้นที่ไม่ว่างในช่วงเวลานี้')).toBeTruthy()
+  expect(screen.getByText(/เลือกพื้นที่หรือเวลาอื่น/)).toBeTruthy()
+  fireEvent.click(screen.getByRole('button', { name: 'กลับไปเลือกพื้นที่/เวลาใหม่' }))
+  expect(await screen.findByText('พื้นที่ที่ใช้งานได้')).toBeTruthy()
+  // ((1)(2) ข้อความจาก API และจำนวนรายการจอง ตรวจด้วย pytest)
+})

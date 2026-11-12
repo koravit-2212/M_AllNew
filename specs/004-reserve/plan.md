@@ -43,6 +43,16 @@
   - รองรับ: FR-BKG-02, FR-BKG-03, FR-BKG-04
 - GET /api/reservations/{reservationId} — output: { reservationStatus, spaceInfo, slotInfo }
   - รองรับ: FR-BKG-03
+- GET /api/space-users — output: { items[{ userId, name, userType }] } [เพิ่ม 2569-11-12 จาก rtm F-06]
+  - รองรับ: CON-ELG-01, Q-01 (ชั่วคราวจนกว่าจะมีระบบยืนยันตัวตน)
+- หมายเหตุ 2569-11-12: GET /api/spaces/available คืน { spaces[ { ..., available, slots[] } ] } (ช่วงเวลาอยู่ในพื้นที่แต่ละแห่ง) และ POST /api/reservations ตอบ 403 เมื่อไม่มีสิทธิ์ (CON-ELG-01) 409 เมื่อไม่ว่าง (FR-BKG-04)
+
+ค่าที่ตั้งได้ (ตัวเลขและกฎจาก spec อยู่ที่เดียว `backend/app/config.py`)
+| ค่า | ที่มา |
+|---|---|
+| `SPACE_ELIGIBLE_USER_TYPES` (student, staff, authorized) | CON-ELG-01, Q-01 |
+| `SPACE_BOOKING_TIMEZONE` (Asia/Bangkok) | Q-05 |
+| `SPACE_SEED_DATA`, `SPACE_SLOT_TIMES`, `SPACE_USER_SEED_DATA` | ข้อมูลตัวอย่าง (ทีมเลือกเอง) |
 - Web page: Reservation Result Screen — แสดงผลสำเร็จหรือผลไม่ว่างพร้อมคำแนะนำให้เลือกพื้นที่/เวลาอื่น
   - รองรับ: FR-BKG-03, FR-BKG-04
 
