@@ -58,17 +58,17 @@ Authentication: SU-IT SSO integration (OAuth/SAML) | ทีมเลือกเ
 ## 4. API / หน้าจอ
 Endpoints (หลัก) — แต่ละรายการระบุ FR ที่รองรับ
 - POST /api/print/upload
-  - Input: multipart file, color_mode, copies
-  - Output: { file_id, pages_detected }
+  - Input: JSON { filename, content_type, size_bytes } (Q-07 ชั่วคราว ส่งเฉพาะข้อมูลไฟล์ ไม่ใช่ multipart) [แก้ 2569-11-12 จาก rtm F-03]
+  - Output: { file_id, filename, size_bytes, pages_detected: null } / ไม่รองรับ: 415 { message, allowed_extensions, max_size_mb }
   - รองรับ: FR-PRT-01, FR-PRT-04
-- GET /api/print/options?file_id={id}
-  - Input: file_id
-  - Output: {pages, estimated_cost, allowed_color_modes}
+- GET /api/print/options?file_id={id}&pages={n}&copies={n}&color_mode={BW|Color}
+  - Input: file_id, pages, copies, color_mode (จำนวนหน้าผู้ใช้กรอกเอง Q-05) [แก้ 2569-11-12 จาก rtm F-05]
+  - Output: {pages, copies, total_pages, estimated_cost, allowed_color_modes}
   - รองรับ: FR-PRT-02, AC-PRT-01
 - POST /api/print/submit
-  - Input: file_id, pages, copies, color_mode, target_printer_id (optional)
-  - Output: { printjob_id, status }
-  - Behavior: ตรวจสอบโควตา (UserQuota), บันทึก PrintJob, ส่งไปยัง print spooler (IF-PRN-01)
+  - Input: file_id, pages, copies, color_mode (ไม่มี target_printer_id ระบบเลือกเครื่องแรกที่พร้อม) [แก้ 2569-11-12 จาก rtm F-04]
+  - Output: { printjob_id, status, total_pages, total_cost, ... } / เครื่องไม่พร้อม: 409 "เครื่องพิมพ์ไม่พร้อมใช้งาน"
+  - Behavior: บันทึก PrintJob, ส่งไปยัง print spooler (IF-PRN-01) ไม่ตรวจโควตา (Q-04, Q-06)
   - รองรับ: FR-PRT-03, FR-PRT-02
 - GET /api/print/jobs/{id}
   - Input: job id
@@ -78,6 +78,14 @@ Endpoints (หลัก) — แต่ละรายการระบุ FR �
   - Input: -
   - Output: list of printers + status
   - รองรับ: FR-PRT-05, IF-PRN-01
+
+ค่าที่ตั้งได้ (ตัวเลขและกฎจาก spec อยู่ที่เดียว `backend/app/config.py`)
+| ค่า | ที่มา |
+|---|---|
+| `PRINT_ALLOWED_EXTENSIONS` | CON-FILE-01, ASM-02 |
+| `PRINT_MAX_FILE_SIZE_MB` (50) | CON-FILE-01, ASM-02 |
+| `PRINT_RATE_PER_PAGE_BAHT` (ขาว-ดำ 1, สี 5) | ASM-01, ASM-03 |
+| `PRINTER_SEED_DATA`, `PRINTER_READY_STATUS` | IF-PRN-01 (ข้อมูลตัวอย่าง) |
 
 หน้าจอ (UI)
 - Upload & Preview (รองรับ FR-PRT-01)
