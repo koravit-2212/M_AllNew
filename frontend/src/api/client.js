@@ -156,6 +156,41 @@ export const api = {
     }
     return res.json()
   },
+  // FR-ACC-01, FR-ACC-04, FR-ACC-05, CON-SEC-01: scan flow ของ kiosk ที่เรียก API หลังบ้านผ่าน HTTPS
+  async scanAccess({ scanMethod, qrCodeOrCardId }) {
+    const res = await fetch(`${BASE}/access/scan`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ scanMethod, qrCodeOrCardId }),
+    })
+    if (!res.ok) {
+      const error = new Error(`Access scan failed: ${res.status}`)
+      error.status = res.status
+      error.detail = (await res.json().catch(() => ({})))?.detail
+      throw error
+    }
+    return res.json()
+  },
+  async getAccessStatus() {
+    const res = await fetch(`${BASE}/access/status`)
+    if (!res.ok) {
+      throw new Error(`Access status failed: ${res.status}`)
+    }
+    return res.json()
+  },
+  async verifyManualAccess({ eventId, staffId, reason, manualApproved }) {
+    const res = await fetch(`${BASE}/access/verify-manual`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ eventId, staffId, reason, manualApproved }),
+    })
+    if (!res.ok) {
+      const error = new Error(`Manual verify failed: ${res.status}`)
+      error.status = res.status
+      throw error
+    }
+    return res.json()
+  },
   async getSlots({ dateFrom, packageCode }) {
     const q = new URLSearchParams({ date_from: dateFrom, package_code: packageCode })
     const res = await fetch(`${BASE}/slots?${q}`)

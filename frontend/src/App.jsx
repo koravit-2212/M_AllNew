@@ -1,5 +1,6 @@
 import { useState } from 'react'
 
+import AccessKioskPage from './pages/AccessKioskPage.jsx'
 import BookDetailPage from './pages/BookDetailPage.jsx'
 import EquipmentLoanPage from './pages/EquipmentLoanPage.jsx'
 import PrintPage from './pages/PrintPage.jsx'
@@ -15,6 +16,7 @@ import StaffLoanApprovalPage from './pages/StaffLoanApprovalPage.jsx'
 // แต่ละฟีเจอร์เพิ่มเมนูของตัวเอง 1 แถวใน MENUS และ 1 กรณีใน renderPage
 const MENUS = [
   { key: 'books', label: 'หนังสือ' },
+  { key: 'access', label: 'เข้าห้องสมุด' },
   { key: 'space-booking', label: 'จองพื้นที่' },
   { key: 'printing', label: 'ปริ้นเอกสาร' },
   { key: 'equipment', label: 'ยืมอุปกรณ์' },
@@ -33,6 +35,8 @@ function BooksSection() {
 
 function renderPage(menuKey) {
   switch (menuKey) {
+    case 'access':
+      return <AccessKioskPage />
     case 'space-booking':
       return <SpaceBookingPage />
     case 'printing':

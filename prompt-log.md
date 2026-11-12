@@ -37,6 +37,171 @@
 
 บันทึกทุกครั้งที่ใช้ AI กับ repo นี้ เขียนต่อท้ายเรื่อย ๆ ไม่ต้องลบของเก่า
 
+## 2026-11-12 20:43 คำสั่ง: /testcases AC-ACC-01 specs/001-acces/
+
+- เครื่องมือ: Copilot ใน Codespaces
+- โหมด: ร่าง (ยังไม่มี test-cases.md ในโฟลเดอร์ feature)
+- ไฟล์: specs/001-access/test-cases.md
+- ผลลัพธ์: สร้างตาราง test case ร่าง 3 แถวสำหรับ AC-ACC-01 ตาม spec และ plan โดยยึดคำสั่ง /testcases สำหรับโหมดร่าง
+- สรุป:
+  - ข้อสรุป: path ที่ระบุในคำสั่งคือ `specs/001-acces/` ซึ่งไม่ตรงกับโฟลเดอร์จริง จึงใช้ `specs/001-access/` ตามโครงสร้าง repo ที่มีอยู่
+  - ยังไม่มีแถวที่มีสถานะ "ใช้ได้" ในตาราง จึงจัดเป็นโหมดร่างและหยุดก่อนเขียนโค้ดทดสอบ
+  - Then ที่ไม่มีข้อมูลชัดเจนใน spec ถูกคงไว้ในกรอบของ FR-ACC-05 และ plan โดยไม่เดาเกินขอบเขต
+
+ข้อความที่ต้องตรวจต่อโดยทีม: "ตรวจแถวในตาราง แก้ได้ตามต้องการ แล้วเปลี่ยนสถานะเป็น 'ใช้ได้' ก่อน จากนั้นสั่ง /testcases อีกครั้ง"
+
+## 2026-11-12 20:46 คำสั่ง: /testcases AC-ACC-02 specs/001-acces/
+
+- เครื่องมือ: Copilot ใน Codespaces
+- โหมด: ร่าง
+- ไฟล์: specs/001-access/test-cases.md
+- ผลลัพธ์: เพิ่มแถว test case ร่าง 3 แถวสำหรับ AC-ACC-02 ตาม FR-ACC-05 และ task T-06/T-07 โดยยังไม่เขียนโค้ด test
+- สรุป:
+  - path ที่ระบุในคำสั่งใช้ `specs/001-acces/` ซึ่งไม่ตรงกับโฟลเดอร์จริง จึงใช้ `specs/001-access/` ตาม repo ที่มีอยู่
+  - มีแถวที่เป็นสถานะ "ใช้ได้" สำหรับ AC-ACC-01 แล้ว แต่ AC-ACC-02 ยังไม่มีแถว "ใช้ได้" ดังนั้นยังถือว่าโหมดร่าง และหยุดก่อนเขียน test ในโค้ด
+  - แถวที่เพิ่มมีทั้งทางปกติ/ขอบ/ทางผิด และยึดข้อความของ FR-ACC-05, ASM-03, task T-06/T-07 เป็นฐานโดยไม่เดาเกินกว่าที่ spec บอก
+
+ข้อความที่ต้องตรวจต่อโดยทีม: "ตรวจแถวในตาราง แก้ได้ตามต้องการ แล้วเปลี่ยนสถานะเป็น 'ใช้ได้' ก่อน จากนั้นสั่ง /testcases อีกครั้ง"
+
+## 2026-11-12 20:47 คำสั่ง: /testcases AC-ACC-03 specs/001-acces/
+
+- เครื่องมือ: Copilot ใน Codespaces
+- โหมด: ร่าง
+- ไฟล์: specs/001-access/test-cases.md
+- ผลลัพธ์: เพิ่มแถว test case ร่าง 3 แถวสำหรับ AC-ACC-03 ตาม FR-ACC-04 และ task T-08/T-09 โดยยังไม่เขียนโค้ด test
+- สรุป:
+  - path ที่ระบุในคำสั่งใช้ `specs/001-acces/` ซึ่งไม่ตรงกับโฟลเดอร์จริง จึงใช้ `specs/001-access/` ตาม repo ที่มีอยู่
+  - AC-ACC-03 ยังไม่มีแถวที่มีสถานะ "ใช้ได้" ในตาราง จึงจัดเป็นโหมดร่างและหยุดก่อนเขียนโค้ดทดสอบ
+  - แถวที่เพิ่มครอบคลุมทางปกติ/ขอบ/ทางผิด โดยยึดข้อความของ FR-ACC-04, IF-STD-02, T-08/T-09 เป็นฐานและไม่เดาเกินขอบเขต
+
+ข้อความที่ต้องตรวจต่อโดยทีม: "ตรวจแถวในตาราง แก้ได้ตามต้องการ แล้วเปลี่ยนสถานะเป็น 'ใช้ได้' ก่อน จากนั้นสั่ง /testcases อีกครั้ง"
+
+## 2026-11-12 20:48 คำสั่ง: /testcases AC-ACC-04 specs/001-acces/
+
+- เครื่องมือ: Copilot ใน Codespaces
+- โหมด: ร่าง
+- ไฟล์: specs/001-access/test-cases.md
+- ผลลัพธ์: เพิ่มแถว test case ร่าง 3 แถวสำหรับ AC-ACC-04 ตาม NFR-PRF-01 / NFR-PRF-02 และ task T-10/T-11 โดยยังไม่เขียนโค้ด test
+- สรุป:
+  - path ที่ระบุในคำสั่งใช้ `specs/001-acces/` ซึ่งไม่ตรงกับโฟลเดอร์จริง จึงใช้ `specs/001-access/` ตาม repo ที่มีอยู่
+  - AC-ACC-04 ยังไม่มีแถวที่มีสถานะ "ใช้ได้" ในตาราง จึงจัดเป็นโหมดร่างและหยุดก่อนเขียนโค้ดทดสอบ
+  - แถวที่เพิ่มครอบคลุมทางปกติ/ขอบ/ทางผิด โดยยึดข้อความของ AC-ACC-04, NFR-PRF-01, NFR-PRF-02, T-10/T-11 เป็นฐานและไม่เดาเกินขอบเขต
+
+ข้อความที่ต้องตรวจต่อโดยทีม: "ตรวจแถวในตาราง แก้ได้ตามต้องการ แล้วเปลี่ยนสถานะเป็น 'ใช้ได้' ก่อน จากนั้นสั่ง /testcases อีกครั้ง"
+
+## 2026-11-12 20:49 คำสั่ง: /verify specs/001-access/
+
+- เครื่องมือ: Copilot ใน Codespaces
+- โหมด: ตรวจ requirement และตามรอย requirement → code → test
+- ไฟล์: specs/001-access/spec.md, tasks.md, plan.md, test-cases.md, specs/001-access/rtm.md
+- ผลลัพธ์: ตรวจโค้ดและ test ของฟีเจอร์ Access แล้วสรุปว่า
+  - Backend: 99 ผ่าน / 1 ไม่ผ่าน
+  - Frontend: Vitest run สำเร็จ (exit 0, ไม่มี failed test)
+  - สถานะรวมตามรอยไปข้างหน้า: ส่วนใหญ่เป็น "ครบ" แต่มี 2 ข้อค้นพบสำคัญคือ
+    1) test_T01_access_api_contract.py ใช้ member ID ที่ไม่มีอยู่ใน seed (`STD-12345`) จึงไม่ใช่ test ที่ตรวจ feature จริง
+    2) FR-ACC-06 มี implementation แต่ไม่มี Acceptance Criteria ใน spec จึงเป็นความคาดหวังที่ไม่มี AC
+
+- สรุป:
+  - requirement ที่มี AC และ code/test ครอบคลุมส่วนใหญ่ถูกทำให้เป็นจริงและผ่าน
+  - requirement ที่ขาด AC คือ FR-ACC-06 เป็นช่องโหว่ของ spec
+  - ผลการตรวจยืนยันว่า Access feature ส่วนใหญ่สอดคล้องกับ spec แต่ยังมีความไม่ครบในระดับ spec/test metadata โดยไม่ใช่การพังของโค้ดหลัก
+
+ข้อความที่ต้องตรวจต่อโดยทีม: "ข้อค้นพบทั้งหมด AI เป็นคนตรวจ และอาจหาไม่ครบ ทีมต้องเปิดโค้ดและ spec ยืนยันทีละข้อ แล้วเขียนช่อง 'ทีมตัดสิน' เอง"
+
+## 2026-11-12 20:14 คำสั่ง: /implement T-03 specs/001-access/tasks.md
+
+- เครื่องมือ: Copilot ใน Codespaces
+- โหมด: implement
+- ไฟล์: specs/001-access/tasks.md, frontend/src/api/client.js, frontend/src/pages/AccessKioskPage.jsx, frontend/src/App.jsx, frontend/src/config.js
+- ผลลัพธ์: สร้างหน้า kiosk สำหรับสแกนเข้าห้องสมุดและเพิ่ม client method สำหรับ `/api/access/scan`, `/api/access/status`, `/api/access/verify-manual` พร้อมเมนูในแอปหลัก
+- การทดสอบ:
+  - `cd /workspaces/M_AllNew/frontend && npm test -- --run src/__tests__/AccessKioskPage.test.jsx` → ผ่าน 2/2
+  - `cd /workspaces/M_AllNew/frontend && npm run build` → ผ่าน build
+- ข้อจำกัด/การคาดเดา:
+  - ไม่มีการคาดเดาเพิ่มเติม เนื่องจาก spec และ task ระบุชัดว่าต้องสร้าง kiosk shell และ client integration สำหรับ scan flow ตาม contract
+- สรุป:
+  - หน้า kiosk เปิดได้ในเมนู “เข้าห้องสมุด” และสามารถสแกนบัตร/QR พร้อมแสดงสถานะสำเร็จ/ไม่สามารถอ่านข้อมูลได้
+  - การเชื่อมต่อ API ใช้ endpoint HTTPS ตาม contract และเก็บค่าคงที่ใน `frontend/src/config.js`
+
+## 2026-11-12 20:34 คำสั่ง: /implement T-04 specs/001-access/tasks.md
+
+- เครื่องมือ: Copilot ใน Codespaces
+- โหมด: implement
+- ไฟล์: backend/app/services/access_service.py, backend/app/services/external_id_service.py, backend/app/api/access.py, backend/tests/test_T04_access_scan_success.py
+- ผลลัพธ์: สร้าง logic ตรวจสอบบัตร/QR กับ member seed, ตรวจสิทธิ์, บันทึก AccessEvent, และอัปเดต currentOccupancy เมื่อ valid
+- การทดสอบ:
+  - `cd /workspaces/M_AllNew/backend && pytest tests/test_T04_access_scan_success.py -q` → ผ่าน 1/1
+- ข้อจำกัด/การคาดเดา:
+  - ไม่มีการเดาเพิ่มเติม เพราะ spec ระบุชัดว่า must validate external identity and eligibility before approval
+- สรุป:
+  - Flow สแกนสำเร็จคืน `status: approved`, `allowed: true`, `memberId`, `memberName`, `currentOccupancy` และบันทึก event ลง store
+  - Logic ใช้ `app/services/member_profile_seed.py` และ `app.config.py` เป็น source of truth สำหรับ member eligibility และ facility occupancy
+
+## 2026-11-12 20:42 คำสั่ง: /implement T-05 specs/001-access/tasks.md
+
+- เครื่องมือ: Copilot ใน Codespaces
+- โหมด: implement
+- ไฟล์: frontend/src/pages/AccessKioskPage.jsx, frontend/src/api/client.js, frontend/src/__tests__/AccessKioskPage.test.jsx
+- ผลลัพธ์: สร้างหน้า kiosk สำหรับกรณี scan สำเร็จ สร้าง card แสดงชื่อ/รหัส/เวลาเข้า และอัปเดตจำนวนผู้ใช้บริการในอาคาร โดยเรียก `/api/access/scan` และแสดง state จาก payload ที่ได้
+- การทดสอบ:
+  - `cd /workspaces/M_AllNew/frontend && npm test -- --run src/__tests__/AccessKioskPage.test.jsx` → ผ่าน 2/2
+- ข้อจำกัด/การคาดเดา:
+  - ไม่มีการเดาเพิ่มเติม เพราะ spec ระบุชัดว่า success screen ต้องแสดงผลยืนยันตัวตนสำเร็จพร้อมข้อมูลสมาชิกและ current occupancy
+
+## 2026-11-12 20:52 คำสั่ง: /implement T-09 specs/001-access/tasks.md
+
+- เครื่องมือ: Copilot ใน Codespaces
+- โหมด: implement
+- ไฟล์: frontend/src/pages/AccessKioskPage.jsx, frontend/src/__tests__/AccessKioskPage.test.jsx
+- ผลลัพธ์: เพิ่ม UX สำหรับกรณีอ่านข้อมูลไม่ได้ โดยแสดงข้อความ “ไม่สามารถอ่านข้อมูลได้” พร้อมข้อความ “ระบบจะไม่บันทึกการเข้าใช้บริการ” และให้ผู้ใช้สแกนใหม่ได้ทันทีเมื่อพิมพ์ค่าใหม่
+- การทดสอบ:
+  - `cd /workspaces/M_AllNew/frontend && npm test -- --run src/__tests__/AccessKioskPage.test.jsx --watch=false` → ผ่าน 3/3
+- ข้อจำกัด/การคาดเดา:
+  - ไม่ได้เพิ่ม behavior เพิ่มเติมนอกเหนือจากกิจกรรมสแกนใหม่และ reset state เพื่อให้ตรงกับ AC-ACC-03 และ T-09
+- สรุป:
+  - หน้า kiosk จัดการ unreadable-scan state ให้แสดงผลชัดเจนและพร้อมกลับสู่ ready state เมื่อผู้ใช้เริ่มพิมพ์ข้อมูลใหม่อีกครั้ง โดยไม่บันทึก access event ใด ๆรเดาเพิ่มเติม เพราะ spec ระบุชัดว่า success screen ต้องแสดงผลยืนยันตัวตนสำเร็จพร้อมข้อมูลสมาชิกและ current occupancy- สรุป:
+  - หน้าจอใช้งานได้ตาม AC-ACC-01 และพร้อมต่อ T-06/T-07 ให้แสดง denial/unreadable state ต่อไป
+
+## 2026-11-12 20:52 คำสั่ง: /implement T-06 specs/001-access/tasks.md
+
+- เครื่องมือ: Copilot ใน Codespaces
+- โหมด: implement
+- ไฟล์: backend/app/services/access_service.py, backend/app/services/manual_verification_service.py, backend/app/models/access_event.py, backend/app/models/manual_verification_audit.py, backend/app/api/access.py, backend/tests/test_T06_access_denied_manual_verification.py
+- ผลลัพธ์: เพิ่ม flow ปฏิเสธการเข้าแบบแยกสาเหตุเป็น ไม่พบข้อมูล / ไม่มีสิทธิ์ / ไม่สามารถตรวจสอบสิทธิ์ได้, บันทึก event ต่อเหตุผลแต่ละกรณี และเปิด manual verification audit log สำหรับเจ้าหน้าที่
+- การทดสอบ:
+  - `cd /workspaces/M_AllNew/backend && pytest tests/test_T02_access_seed_data.py tests/test_T04_access_scan_success.py tests/test_T06_access_denied_manual_verification.py -q` → ผ่าน 4/4
+- ข้อจำกัด/การคาดเดา:
+  - ถูกจำกัดไว้ที่เงื่อนไขที่ spec ระบุเรื่องสิทธิ์ไม่ผ่านและ manual verification เท่านั้น ไม่ขยายไปยัง flow ที่ไม่ได้กำหนด
+- สรุป:
+  - denial flow ถูกแยกสาเหตุและมี audit trail สำหรับเจ้าหน้าที่ซึ่งสามารถยืนยันหรือปฏิเสธด้วยมือได้ตาม FR-ACC-05 และ FR-ACC-06
+
+## 2026-11-12 20:31 คำสั่ง: /implement T-07 specs/001-access/tasks.md
+
+- เครื่องมือ: Copilot ใน Codespaces
+- โหมด: implement
+- ไฟล์: frontend/src/pages/AccessKioskPage.jsx, frontend/src/__tests__/AccessKioskPage.test.jsx
+- ผลลัพธ์: เพิ่มการแสดงสถานะปฏิเสธ ณ จุดสแกนแบบแยกสาเหตุเป็น ไม่พบข้อมูล / ไม่มีสิทธิ์ / ไม่สามารถตรวจสอบสิทธิ์ได้ พร้อมข้อความให้ลองใหม่หรือติดต่อเจ้าหน้าที่ เมื่อ API คืน 403/404 หรือมี error.detail
+- การทดสอบ:
+  - `cd /workspaces/M_AllNew/frontend && npm test -- --run src/__tests__/AccessKioskPage.test.jsx` → ผ่าน 3/3
+- ข้อจำกัด/การคาดเดา:
+  - จำกัดเฉพาะ UI denial flow ตาม T-07 ไม่ไปขยายสู่ unreadable flow ที่เป็น T-09 และไม่สร้าง state ใหม่ที่ไม่ได้ระบุใน spec
+- สรุป:
+  - kiosk จะแสดงข้อความปฏิเสธอย่างชัดเจนและตรงกับ FR-ACC-05 สำหรับกรณีไม่มีสิทธิ์หรือไม่พบข้อมูล พร้อมข้อแนะนำให้ติดต่อเจ้าหน้าที่
+
+## 2026-11-12 20:35 คำสั่ง: /implement T-08 specs/001-access/tasks.md
+
+- เครื่องมือ: Copilot ใน Codespaces
+- โหมด: implement
+- ไฟล์: backend/app/services/access_service.py, backend/tests/test_T08_access_unreadable_scan.py
+- ผลลัพธ์: เพิ่ม validation สำหรับกรณีสแกนข้อมูลว่างหรือ method ไม่ถูกต้อง ให้คืน `AccessScanUnreadable` และยืนยันว่าไม่สร้าง AccessEvent หรือปรับ occupancy ใด ๆ
+- การทดสอบ:
+  - `cd /workspaces/M_AllNew/backend && pytest tests/test_T02_access_seed_data.py tests/test_T04_access_scan_success.py tests/test_T06_access_denied_manual_verification.py tests/test_T08_access_unreadable_scan.py -q` → ผ่าน 5/5
+- ข้อจำกัด/การคาดเดา:
+  - จำกัดเฉพาะ unreadable scan flow ตาม T-08 เท่านั้น ไม่ขยายไปถึง UI T-09 หรือ denial logic ข้างต้น
+- สรุป:
+  - ระบบยืนยันว่าการอ่านข้อมูลไม่ได้จะไม่บันทึกการเข้าใช้บริการและยึดตาม FR-ACC-04 / IF-STD-02 อย่างเคร่งครัด
+
+
 ## 2026-11-12 06:20 คำสั่ง: /testcases AC-SRC-01 specs/003-searchBook/
 
 - เครื่องมือ: Copilot ใน Codespaces
@@ -391,8 +556,33 @@
 - ผลลัพธ์: สร้างไฟล์ `specs/003-searchBook/tasks.md` พร้อมแยกงานเป็น 5 เฟส และ 11 task
 - สรุปผลลัพธ์:
   - เฟสทั้งหมด: 5 เฟส
-  - task ทั้งหมด: 11 task
-  - task ที่รอ Q-xx: 0 task
+
+## 2026-11-12 20:35 คำสั่ง: /implement T-010 specs/001-access/tasks.md
+
+- เครื่องมือ: Copilot ใน Codespaces
+- โหมด: implement
+- ไฟล์: backend/app/config.py, backend/app/models/facility_occupancy.py, backend/app/services/access_service.py, backend/app/api/access.py, backend/app/repositories/access_repository.py, backend/tests/test_AC_ACC_04_500_concurrent_users.py, backend/tests/load_test_access.py
+- ผลลัพธ์: ปรับ backend ให้ใช้งาน shared lock และ repository สำหรับ atomic occupancy update เมื่อมี concurrent access 500 requests พร้อมกัน และเพิ่ม test ตรวจสอบ concurrency + latency
+- การทดสอบ:
+  - `cd /workspaces/M_AllNew/backend && pytest -q tests/test_T04_access_scan_success.py tests/test_T08_access_unreadable_scan.py tests/test_AC_ACC_04_500_concurrent_users.py` → ผ่าน 3/3
+- ข้อจำกัด/การคาดเดา:
+  - ใช้ task ID T-10 เหมือนกับที่ระบุใน `specs/001-access/tasks.md` โดย T-010 ในข้อความผู้ใช้ดูเหมือนจะเป็นการพิมพ์ตัวเลขซ้ำ/ตัดต่อ
+- สรุป:
+  - AccessStore และ AccessRepository ทำให้การบันทึก event และการอัปเดต current_occupancy เป็น atomic ภายใต้ shared lock เพื่อป้องกัน race condition และรับ concurrent request 500 คนได้
+  - `ACCESS_CONCURRENT_REQUEST_LIMIT` และ `ACCESS_VALIDATION_TARGET_SECONDS` ถูกเก็บไว้ใน `backend/app/config.py` ตามข้อกำหนดของ spec เฟส  - task ทั้งหมด: 11 task
+
+## 2026-11-12 20:38 คำสั่ง: /implement T-011 specs/001-access/tasks.md
+
+- เครื่องมือ: Copilot ใน Codespaces
+- โหมด: implement
+- ไฟล์: backend/tests/test_AC_ACC_04_500_concurrent_users.py, backend/tests/load_test_access.py
+- ผลลัพธ์: ทำ load test สำหรับ 500 concurrent requests พร้อมกันและยืนยันว่าระบบยังให้บริการได้โดยอัปเดต occupancy ถูกต้องตามเงื่อนไขของ AC-ACC-04
+- การทดสอบ:
+  - `cd /workspaces/M_AllNew/backend && pytest -q tests/test_T04_access_scan_success.py tests/test_T08_access_unreadable_scan.py tests/test_AC_ACC_04_500_concurrent_users.py` → ผ่าน 3/3
+- ข้อจำกัด/การคาดเดา:
+  - ไม่มีการเดาเพิ่มเติม; task ระบุชัดว่าให้ทำ load test สำหรับ 500 requests พร้อมกัน และตรวจ latency
+- สรุป:
+  - Load test สร้าง concurrent access requests 500 ครั้งแบบ parallel และตรวจว่าทุก request สำเร็จ, `current_occupancy` เพิ่มตามจำนวน successful requests, และใช้เงื่อนไขจาก `backend/app/config.py` แทนค่าคงที่ embedded ใน code เฟส  - task ทั้งหมด: 11 task  - task ที่รอ Q-xx: 0 task
   - เฟสแรกที่ลองใช้งานได้จริง: เฟส 1 (`AC-SRC-01`)
 - ข้อสังเกต: feature นี้ไม่มี Open Questions ใน spec.md ปัจจุบัน จึงไม่มี task ที่กำหนดสถานะ "รอ Q-xx"
 - ตารางตรวจความครบและ traceability ได้รวมไว้ใน `tasks.md` เสร็จสิ้น
@@ -1192,3 +1382,41 @@
 - เลิก track ไฟล์ `__pycache__/*.pyc` ทั้งหมด และเพิ่ม `__pycache__/`, `*.pyc`, `.pytest_cache/` ใน `.gitignore`
 - ผล test หลังรวม: หลังบ้าน 93 passed, หน้าจอ 54 passed
 - ยังไม่ push (AI push ไม่ได้ ทีมต้องสั่งเอง)
+
+---
+## 2026-11-12 18:43 คำสั่ง: /tasks specs/001-access/spec.md
+
+- เครื่องมือ: Copilot ใน Codespaces
+- โหมด: tasks
+- ไฟล์: specs/001-access/spec.md
+- ผลลัพธ์: สร้างไฟล์ `specs/001-access/tasks.md` เป็นแผนงานแยก task ตาม vertical slice 5 เฟส และ 11 task โดยยึดตาม spec.md และ plan.md
+- สรุป:
+  - เฟส 0: ฐานราก API/schema/data seed/หน้า kiosk shell
+  - เฟส 1: AC-ACC-01 สแกนสำเร็จและอนุญาตให้เข้า
+  - เฟส 2: AC-ACC-02 ปฏิเสธเมื่อไม่มีสิทธิ์
+  - เฟส 3: AC-ACC-03 อ่านข้อมูลไม่ได้และไม่บันทึกการเข้าใช้บริการ
+  - เฟส 4: AC-ACC-04 รองรับ 500 คนพร้อมกันทันที
+- ข้อสั่งต่อ: รอคำสั่งแยกเพื่อเริ่ม implement จริงตาม task ที่แยกไว้
+- การกระทำ: ไม่เริ่มทำ task ใด ๆ ในรอบนี้ ตามเงื่อนไขของ /tasks
+
+---
+
+---
+## 2026-11-12 19:29 คำสั่ง: /implement T-01
+
+- เครื่องมือ: Copilot ใน Codespaces
+- ไฟล์ที่สร้าง/แก้: `backend/app/main.py`, `backend/app/api/access.py`, `backend/app/models/access_event.py`, `backend/app/models/facility_occupancy.py`, `backend/tests/test_T01_access_api_contract.py`
+- ผล test: `cd /workspaces/M_AllNew/backend && pytest -q tests/test_T01_access_api_contract.py` -> `1 passed in 0.05s`
+- สิ่งที่เกือบต้องเดาแต่ถามแทน: ไม่มี; task ชัดเจนว่าต้องสร้าง API contract ของ `/api/access/scan`, `/api/access/status`, `/api/access/verify-manual` และไม่เพิ่มฟีเจอร์เกินจาก FR-ACC-01/03/06 และ CON-IDN-01/CON-SEC-01
+
+---
+
+---
+## 2026-11-12 19:47 คำสั่ง: /implement T-02
+
+- เครื่องมือ: Copilot ใน Codespaces
+- ไฟล์ที่สร้าง/แก้: `backend/app/config.py`, `backend/app/services/member_profile_seed.py`, `backend/tests/test_T02_access_seed_data.py`
+- ผล test: `cd /workspaces/M_AllNew/backend && pytest -q tests/test_T02_access_seed_data.py` -> `1 passed in 0.02s`
+- สิ่งที่เกือบต้องเดาแต่ถามแทน: ไม่มี; spec และ plan ระบุชัดว่า “มีข้อมูลตัวอย่างนักศึกษา/บุคลากรที่ valid และ invalid พร้อมสถานะการเข้าใช้บริการ” และแก้ไขตาม FR-ACC-01/FR-ACC-02/CON-ELG-01 ได้โดยไม่เพิ่มฟีเจอร์ใหม่
+
+---

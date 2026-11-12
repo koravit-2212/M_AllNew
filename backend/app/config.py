@@ -116,6 +116,59 @@ SPACE_USER_SEED_DATA = [
 ]
 
 # ---------------------------------------------------------------------------
+# 001-access ใช้บริการเข้าใช้ห้องสมุด
+# ---------------------------------------------------------------------------
+
+# FR-ACC-01, FR-ACC-02, CON-ELG-01, DOM-PRV-01
+# ข้อมูลสมาชิกตัวอย่างสำหรับการยืนยันตัวตนและตรวจสิทธิ์
+# member_id ใช้ติดตามการเข้า/ออกและ manual verification โดยไม่เก็บข้อมูลบัตรประชาชนแบบละเอียด
+ACCESS_CONCURRENT_REQUEST_LIMIT = 500
+ACCESS_VALIDATION_TARGET_SECONDS = 2
+
+ACCESS_MEMBER_SEED_DATA = [
+    {
+        'member_id': 'STD-1001',
+        'member_type': 'student',
+        'name': 'นักศึกษาตัวอย่าง ก',
+        'eligibility_status': 'eligible',
+        'status': 'active',
+        'last_verified_at': '2026-11-12T08:30:00+00:00',
+    },
+    {
+        'member_id': 'STF-2001',
+        'member_type': 'staff',
+        'name': 'บุคลากรตัวอย่าง',
+        'eligibility_status': 'eligible',
+        'status': 'active',
+        'last_verified_at': '2026-11-12T08:30:00+00:00',
+    },
+    {
+        'member_id': 'STD-1002',
+        'member_type': 'student',
+        'name': 'นักศึกษาตัวอย่าง ข',
+        'eligibility_status': 'ineligible',
+        'status': 'inactive',
+        'last_verified_at': None,
+    },
+    {
+        'member_id': 'UNKNOWN-999',
+        'member_type': 'unknown',
+        'name': 'ไม่พบข้อมูล',
+        'eligibility_status': 'not_found',
+        'status': 'unverified',
+        'last_verified_at': None,
+    },
+    {
+        'member_id': 'STD-1003',
+        'member_type': 'student',
+        'name': 'นักศึกษาตัวอย่าง ค',
+        'eligibility_status': 'verification_failed',
+        'status': 'active',
+        'last_verified_at': None,
+    },
+]
+
+# ---------------------------------------------------------------------------
 # 006-printing ใช้บริการปริ้นเอกสาร
 # ---------------------------------------------------------------------------
 
