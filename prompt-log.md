@@ -839,3 +839,11 @@
 - ผล test: หลังบ้าน 11 passed, หน้าจอ 8 passed
 - เมนูหน้าเดิมชื่อ "หนังสือ" และจัดเป็นอาร์เรย์ MENUS แบบเดียวกับ branch 004 และ 006
 - ทีมสั่ง "เสร็จแล้ว commit แล้ว push เลย": push main และ branch 004-reserve, 006-printing, 007-equipment
+
+## 2026-11-12 คำสั่ง: /implement-all 007-equipment เฟส 1 — T-03
+
+- ก่อนเริ่ม: ทีมยืนยันว่าลองจุดตรวจเฟส 0 แล้วผ่าน จึงเปลี่ยน T-01, T-02 เป็น "เสร็จ"
+- task: T-03 สร้าง API GET /api/equipment-types และลงทะเบียน router
+- ไฟล์ที่แตะ: `backend/app/api/equipment.py`, `backend/app/main.py`, `backend/tests/test_AC_EQP_01_equipment_types.py` (และ `specs/007-equipment/tasks.md` สถานะ)
+- ผล test: หลังบ้าน 12 passed, หน้าจอ 8 passed
+- คืนทุกประเภทอุปกรณ์รวมที่คงเหลือ 0 เพื่อให้หน้าจอแสดงป้าย "หมด" ได้ใน AC-EQP-03
