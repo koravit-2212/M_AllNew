@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react'
 
 import { api, getErrorStatus } from '../api/client.js'
+import { EQUIPMENT_REQUEST_QUANTITY } from '../config.js'
 
 // FR-EQP-01, FR-EQP-02, FR-EQP-05, ASM-01, NFR-USB-01
 // หน้ายืมอุปกรณ์ของนักศึกษา (UI-EQP-01) แสดงประเภทอุปกรณ์ให้เลือก แล้วส่งคำขอให้เจ้าหน้าที่อนุมัติ
 // อุปกรณ์ที่หมดแสดงป้าย "หมด" ข้อความ "ไม่สามารถยืมได้" และกดส่งคำขอไม่ได้
 
-// UI-EQP-01 ไม่มีช่องเลือกจำนวน ส่งคำขอครั้งละ 1 ชิ้นตาม mockup "× 1" (ทีมเลือกเอง ไม่ได้มาจาก spec)
-const REQUEST_QUANTITY = 1
+// FR-EQP-02, Q-11: จำนวนต่อคำขอมาจาก config
+const REQUEST_QUANTITY = EQUIPMENT_REQUEST_QUANTITY
 
 export default function EquipmentLoanPage({ client = api }) {
   const [items, setItems] = useState([])

@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import date, datetime, timedelta
 from zoneinfo import ZoneInfo
 
-from app.config import EQUIPMENT_LOAN_DAYS, LIBRARY_TIMEZONE
+from app.config import EQUIPMENT_LOAN_DAYS, EQUIPMENT_MAX_QUANTITY_PER_REQUEST, LIBRARY_TIMEZONE
 from app.models.equipment import EquipmentStore, LoanRecord, LoanRequest
 
 # FR-EQP-02, FR-EQP-03, FR-EQP-04, ASM-01
@@ -37,6 +37,7 @@ class InsufficientStock(Exception):
 def create_loan_request(store: EquipmentStore, student_id: str, equipment_type_id: str, quantity: int) -> LoanRequest:
     """FR-EQP-02, ASM-01: สร้างคำขอยืมสถานะรออนุมัติ ยังไม่ลดจำนวนคงเหลือ เพราะต้องผ่านเจ้าหน้าที่เสมอ
     FR-EQP-05: ถ้าจำนวนคงเหลือไม่พอ ปฏิเสธทันที ไม่สร้างคำขอ
+    Q-11: ขอเกินจำนวนสูงสุดต่อคำขอ ปฏิเสธแบบเดียวกัน ("ไม่สามารถยืมได้")
     """
 
     with store.lock:
@@ -45,6 +46,8 @@ def create_loan_request(store: EquipmentStore, student_id: str, equipment_type_i
         if student_id not in store.students:
             raise StudentNotFound(student_id)
         if store.equipment_types[equipment_type_id].available_count < quantity:
+            raise InsufficientStock(equipment_type_id)
+        if quantity > EQUIPMENT_MAX_QUANTITY_PER_REQUEST:
             raise InsufficientStock(equipment_type_id)
 
         request_id = f'REQ-{len(store.requests) + 1:04d}'

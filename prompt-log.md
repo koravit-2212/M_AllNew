@@ -1024,3 +1024,9 @@
 - ไฟล์ที่แตะ: `frontend/src/api/client.js` (เพิ่ม `error.status` และ `getErrorStatus`), `frontend/src/pages/EquipmentLoanPage.jsx`, `frontend/src/__tests__/EquipmentLoanPage.test.jsx` (เพิ่ม 2 test ไม่แตะ TC)
 - 409 แสดง "ไม่สามารถยืมได้" เหตุอื่นแสดง "ส่งคำขอไม่สำเร็จ กรุณาลองใหม่"
 - ผล test: หลังบ้าน 43 passed, หน้าจอ 30 passed
+
+## 2026-11-12 /implement T-17 (rtm F-04, Q-11)
+
+- ไฟล์ที่แตะ: `backend/app/config.py` (`EQUIPMENT_MAX_QUANTITY_PER_REQUEST = 1`, คอมเมนต์ `LIBRARY_TIMEZONE` อ้าง Q-12), `backend/app/services/equipment_service.py`, `backend/tests/test_AC_EQP_03_quantity_limit.py`, `frontend/src/config.js` (ใหม่), `frontend/src/pages/EquipmentLoanPage.jsx`
+- ขอเกินจำนวนสูงสุดต่อคำขอ ตอบ 409 "ไม่สามารถยืมได้" (ตรวจหลังเช็กคงเหลือ เพื่อให้ TC-EQP-03-2 ยังได้ผลเดิม)
+- ผล test: หลังบ้าน 45 passed, หน้าจอ 30 passed

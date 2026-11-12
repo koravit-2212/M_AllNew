@@ -73,5 +73,8 @@ EQUIPMENT_LOAN_DAYS = {
     'EQ-BAG': 1,
 }
 
-# FR-EQP-04: เขตเวลาที่ใช้นับ "วันที่ยืม" ตาม glossary (วันเดียวกัน = Asia/Bangkok)
+# FR-EQP-04, Q-12: เขตเวลาที่ใช้นับ "วันที่ยืม" และ due date
 LIBRARY_TIMEZONE = 'Asia/Bangkok'
+
+# FR-EQP-02, Q-11: จำนวนที่ขอยืมได้สูงสุดต่อคำขอ (ครั้งละ 1 ชิ้น)
+EQUIPMENT_MAX_QUANTITY_PER_REQUEST = 1
