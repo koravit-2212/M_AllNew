@@ -831,3 +831,11 @@
 - ไฟล์ที่แตะ: `backend/app/config.py`, `backend/app/models/equipment.py`, `backend/tests/test_EQP_T01_equipment_store.py`
 - ผล test: หลังบ้าน 11 passed, หน้าจอ 7 passed
 - เกือบต้องเดา: due date ต่อประเภทอุปกรณ์ (ASM-03) จึงไม่ใส่ใน config รอ T-13
+
+## 2026-11-12 คำสั่ง: /implement-all specs/007-equipment/tasks.md เฟส 0 — T-02
+
+- task: T-02 เพิ่มเมนูไปหน้ายืมอุปกรณ์ใน App.jsx โดยไม่ลบหน้าเดิม
+- ไฟล์ที่แตะ: `frontend/src/App.jsx`, `frontend/src/pages/EquipmentLoanPage.jsx`, `frontend/src/__tests__/App.test.jsx`
+- ผล test: หลังบ้าน 11 passed, หน้าจอ 8 passed
+- เมนูหน้าเดิมชื่อ "หนังสือ" และจัดเป็นอาร์เรย์ MENUS แบบเดียวกับ branch 004 และ 006
+- ทีมสั่ง "เสร็จแล้ว commit แล้ว push เลย": push main และ branch 004-reserve, 006-printing, 007-equipment
