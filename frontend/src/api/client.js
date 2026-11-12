@@ -47,6 +47,26 @@ export const api = {
     }
     return res.json()
   },
+  // FR-EQP-03: คำขอยืมที่รอเจ้าหน้าที่ตรวจสอบ พร้อมข้อมูลนักศึกษาและรายการค้างคืน
+  async listPendingLoanRequests() {
+    const res = await fetch(`${BASE}/loan-requests`)
+    if (!res.ok) {
+      throw new Error(`Pending loan requests failed: ${res.status}`)
+    }
+    return res.json()
+  },
+  // FR-EQP-04: เจ้าหน้าที่อนุมัติ ได้จำนวนคงเหลือใหม่กลับมา
+  async approveLoanRequest(requestId) {
+    const res = await fetch(`${BASE}/loan-requests/${encodeURIComponent(requestId)}/approve`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({}),
+    })
+    if (!res.ok) {
+      throw new Error(`Approve failed: ${res.status}`)
+    }
+    return res.json()
+  },
   async getSlots({ dateFrom, packageCode }) {
     const q = new URLSearchParams({ date_from: dateFrom, package_code: packageCode })
     const res = await fetch(`${BASE}/slots?${q}`)

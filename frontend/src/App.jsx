@@ -3,13 +3,16 @@ import { useState } from 'react'
 import BookDetailPage from './pages/BookDetailPage.jsx'
 import EquipmentLoanPage from './pages/EquipmentLoanPage.jsx'
 import SearchPage from './pages/SearchPage.jsx'
+import StaffLoanApprovalPage from './pages/StaffLoanApprovalPage.jsx'
 
 // FR-SRC-02, FR-SRC-03, AC-SRC-04: สลับระหว่าง Search Page และ Book Detail Page ตามการเลือกหนังสือ
 // FR-EQP-01, NFR-USB-01: เมนูไปหน้ายืมอุปกรณ์ (007-equipment) โดยไม่ลบหน้าเดิม
+// FR-EQP-03, FR-EQP-04: เมนูเจ้าหน้าที่อนุมัติการยืมอุปกรณ์ ยังไม่ตรวจสิทธิ์จนกว่าจะมี 001/002 (คำตอบทีมข้อ 3)
 // แต่ละฟีเจอร์เพิ่มเมนูของตัวเอง 1 แถวใน MENUS และ 1 กรณีใน renderPage
 const MENUS = [
   { key: 'books', label: 'หนังสือ' },
   { key: 'equipment', label: 'ยืมอุปกรณ์' },
+  { key: 'equipment-staff', label: 'อนุมัติยืมอุปกรณ์ (เจ้าหน้าที่)' },
 ]
 
 function BooksSection() {
@@ -26,6 +29,8 @@ function renderPage(menuKey) {
   switch (menuKey) {
     case 'equipment':
       return <EquipmentLoanPage />
+    case 'equipment-staff':
+      return <StaffLoanApprovalPage />
     default:
       return <BooksSection />
   }
