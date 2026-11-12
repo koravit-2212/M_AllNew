@@ -1,5 +1,6 @@
 // T-04 (FR-EQP-01, NFR-USB-01) ตรวจด้วย AC-EQP-01
 // T-07 (FR-EQP-02, ASM-01, NFR-USB-01) ตรวจด้วย AC-EQP-02
+// T-10 (FR-EQP-05, NFR-USB-01) ตรวจด้วย AC-EQP-03
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { vi } from 'vitest'
 
@@ -70,5 +71,36 @@ describe('AC-EQP-02 นักศึกษาส่งคำขอยืมให
     expect(await screen.findByText('ส่งคำขอแล้ว')).toBeTruthy()
     expect(screen.getByText('รอเจ้าหน้าที่ตรวจสอบและอนุมัติ')).toBeTruthy()
     expect(screen.getByText('อุปกรณ์ทดสอบ 1 × 1')).toBeTruthy()
+  })
+})
+
+describe('AC-EQP-03 อุปกรณ์หมด', () => {
+  it('AC-EQP-03 เลือกอุปกรณ์ที่คงเหลือ 0 แล้วเห็นป้ายหมด ข้อความไม่สามารถยืมได้ และกดส่งคำขอไม่ได้', async () => {
+    // Given อุปกรณ์ที่ต้องการหมด
+    const client = makeClient([
+      { equipment_type_id: 'A', name: 'อุปกรณ์ทดสอบ 1', available_count: 2 },
+      { equipment_type_id: 'Z', name: 'อุปกรณ์ทดสอบหมด', available_count: 0 },
+    ])
+    render(<EquipmentLoanPage client={client} />)
+    await screen.findByText('อุปกรณ์ทดสอบหมด')
+    await screen.findByRole('option', { name: /นักศึกษาทดสอบ 1/ })
+    expect(screen.getByText('หมด')).toBeTruthy()
+    expect(screen.getByText('คงเหลือ 0')).toBeTruthy()
+
+    // When นักศึกษาขอยืมอุปกรณ์ (เลือกอุปกรณ์ที่หมด)
+    fireEvent.click(screen.getByRole('button', { name: /อุปกรณ์ทดสอบหมด/ }))
+
+    // Then ระบบแจ้งว่าไม่สามารถยืมได้ และส่งคำขอไม่ได้
+    expect(screen.getByText('ไม่สามารถยืมได้')).toBeTruthy()
+    expect(screen.getByText(/อุปกรณ์ทดสอบหมดหมดแล้ว กรุณาเลือกอุปกรณ์อื่น/)).toBeTruthy()
+    const submit = screen.getByRole('button', { name: 'ส่งคำขอยืม' })
+    expect(submit.disabled).toBe(true)
+    fireEvent.click(submit)
+    expect(client.createLoanRequest).not.toHaveBeenCalled()
+
+    // เลือกอุปกรณ์อื่นที่ยังมี ข้อความหายและส่งคำขอได้
+    fireEvent.click(screen.getByRole('button', { name: /อุปกรณ์ทดสอบ 1/ }))
+    expect(screen.queryByText('ไม่สามารถยืมได้')).toBeNull()
+    expect(submit.disabled).toBe(false)
   })
 })

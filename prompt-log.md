@@ -908,3 +908,11 @@
 - ไฟล์ที่แตะ: `backend/app/services/equipment_service.py`, `backend/app/api/equipment.py`, `backend/tests/test_AC_EQP_03_out_of_stock_message.py` (และ `tasks.md`, `prompt-log.md`)
 - ผล test: หลังบ้าน 19 passed, หน้าจอ 11 passed
 - POST /api/loan-requests ตอบ 409 "ไม่สามารถยืมได้" (FR-EQP-05) เมื่อคงเหลือน้อยกว่าจำนวนที่ขอ และไม่สร้างคำขอ
+
+## 2026-11-12 คำสั่ง: /implement-all 007-equipment เฟส 3 — T-10
+
+- task: T-10 แสดง "ไม่สามารถยืมได้" และปิดปุ่มส่งคำขอเมื่ออุปกรณ์หมด
+- ไฟล์ที่แตะ: `frontend/src/pages/EquipmentLoanPage.jsx`, `frontend/src/__tests__/EquipmentLoanPage.test.jsx` (และ `tasks.md`, `prompt-log.md`)
+- ผล test: หลังบ้าน 19 passed, หน้าจอ 12 passed
+- ข้อความตาม UI-EQP-01 สถานะอุปกรณ์หมด: ป้าย "หมด", "ไม่สามารถยืมได้", "<ชื่อ>หมดแล้ว กรุณาเลือกอุปกรณ์อื่น" ปุ่ม "ส่งคำขอยืม" กดไม่ได้
+- ถ้าอุปกรณ์หมดระหว่างที่หน้าเปิดค้างอยู่ หลังบ้านตอบ 409 (T-09) แต่หน้าจอยังไม่แสดงข้อความ เพราะต้องแก้ `client.js` ซึ่งไม่อยู่ในไฟล์ของ T-10

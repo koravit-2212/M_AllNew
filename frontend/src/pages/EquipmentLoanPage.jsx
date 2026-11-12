@@ -2,9 +2,9 @@ import { useEffect, useState } from 'react'
 
 import { api } from '../api/client.js'
 
-// FR-EQP-01, FR-EQP-02, ASM-01, NFR-USB-01
+// FR-EQP-01, FR-EQP-02, FR-EQP-05, ASM-01, NFR-USB-01
 // หน้ายืมอุปกรณ์ของนักศึกษา (UI-EQP-01) แสดงประเภทอุปกรณ์ให้เลือก แล้วส่งคำขอให้เจ้าหน้าที่อนุมัติ
-// สถานะอุปกรณ์หมดเพิ่มใน T-10
+// อุปกรณ์ที่หมดแสดงป้าย "หมด" ข้อความ "ไม่สามารถยืมได้" และกดส่งคำขอไม่ได้
 
 // UI-EQP-01 ไม่มีช่องเลือกจำนวน ส่งคำขอครั้งละ 1 ชิ้นตาม mockup "× 1" (ทีมเลือกเอง ไม่ได้มาจาก spec)
 const REQUEST_QUANTITY = 1
@@ -45,10 +45,12 @@ export default function EquipmentLoanPage({ client = api }) {
   }, [client])
 
   const selectedItem = items.find((item) => item.equipment_type_id === selectedId)
+  // FR-EQP-02, FR-EQP-05: ตรวจจำนวนคงเหลือก่อนให้ส่งคำขอ
+  const selectedOutOfStock = Boolean(selectedItem) && selectedItem.available_count < REQUEST_QUANTITY
 
   // FR-EQP-02, ASM-01: ส่งคำขอยืม ผลคือรอเจ้าหน้าที่ตรวจสอบและอนุมัติ ไม่ใช่ยืมได้ทันที
   const submitRequest = async () => {
-    if (!selectedItem || !studentId) return
+    if (!selectedItem || !studentId || selectedOutOfStock) return
     setSubmitting(true)
     try {
       const request = await client.createLoanRequest({
@@ -126,8 +128,10 @@ export default function EquipmentLoanPage({ client = api }) {
                     <span className="block font-bold text-slate-800">{item.name}</span>
                     <span className="block text-sm text-slate-500">คงเหลือ {item.available_count}</span>
                   </span>
-                  {item.available_count > 0 && (
+                  {item.available_count > 0 ? (
                     <span className="rounded-full bg-emerald-100 px-3 py-0.5 text-xs text-emerald-700">ว่าง</span>
+                  ) : (
+                    <span className="rounded-full bg-rose-100 px-3 py-0.5 text-xs text-rose-700">หมด</span>
                   )}
                 </button>
               </li>
@@ -135,11 +139,18 @@ export default function EquipmentLoanPage({ client = api }) {
           })}
         </ul>
 
-        <p className="mt-3 text-xs text-slate-500">เจ้าหน้าที่จะตรวจสอบและอนุมัติคำขอก่อนยืมเสมอ</p>
+        {selectedOutOfStock ? (
+          <div className="mt-3 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800" role="alert">
+            <b className="block text-base">ไม่สามารถยืมได้</b>
+            {selectedItem.name}หมดแล้ว กรุณาเลือกอุปกรณ์อื่น
+          </div>
+        ) : (
+          <p className="mt-3 text-xs text-slate-500">เจ้าหน้าที่จะตรวจสอบและอนุมัติคำขอก่อนยืมเสมอ</p>
+        )}
         <button
           type="button"
           onClick={submitRequest}
-          disabled={!selectedItem || !studentId || submitting}
+          disabled={!selectedItem || !studentId || selectedOutOfStock || submitting}
           className="mt-4 w-full rounded-xl bg-teal-700 px-4 py-3 font-bold text-white disabled:bg-slate-300"
         >
           ส่งคำขอยืม
