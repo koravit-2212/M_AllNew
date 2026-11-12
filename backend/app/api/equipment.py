@@ -116,7 +116,7 @@ def approve_loan_request_endpoint(
     body: ApproveIn | None = None,
     store: EquipmentStore = Depends(get_equipment_store),
 ) -> dict:
-    """FR-EQP-03, FR-EQP-04: เจ้าหน้าที่อนุมัติ บันทึกการยืม และคืนจำนวนคงเหลือใหม่"""
+    """FR-EQP-03, FR-EQP-04: เจ้าหน้าที่อนุมัติ บันทึกการยืม และคืนจำนวนคงเหลือใหม่กับ due date"""
 
     approver_id = body.approver_id if body else ''
     try:
@@ -137,4 +137,5 @@ def approve_loan_request_endpoint(
         'equipment_name': equipment.name,
         'quantity': loan.quantity,
         'available_count': equipment.available_count,
+        'due_date': loan.due_date.isoformat() if loan.due_date else None,
     }

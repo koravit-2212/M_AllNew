@@ -1,5 +1,6 @@
 // T-08 (FR-EQP-03, FR-EQP-04, NFR-USB-01) ตรวจด้วย AC-EQP-02
 // T-12 (FR-EQP-06, NFR-USB-01) ตรวจด้วย AC-EQP-04
+// T-13 (FR-EQP-04, Q-03) ตรวจด้วย AC-EQP-02 (กำหนดคืน)
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { vi } from 'vitest'
 
@@ -12,6 +13,7 @@ const PENDING = {
   student: { student_id: 'S1', name: 'นักศึกษาทดสอบ 1' },
   outstanding_items: [],
   equipment: { equipment_type_id: 'A', name: 'อุปกรณ์ทดสอบ', available_count: 3 },
+  due_date: '2026-11-13',
 }
 
 describe('AC-EQP-02 เจ้าหน้าที่อนุมัติ ระบบบันทึกการยืมและลดจำนวนคงเหลือ', () => {
@@ -94,5 +96,34 @@ describe('AC-EQP-04 นักศึกษามีรายการค้าง
     fireEvent.click(await screen.findByRole('button', { name: /นักศึกษาทดสอบ 1/ }))
 
     expect(screen.queryByText('มีรายการค้างคืน')).toBeNull()
+  })
+})
+
+describe('AC-EQP-02 กำหนดคืน (due date) ตามประเภทอุปกรณ์', () => {
+  it('AC-EQP-02 เห็นกำหนดคืนก่อนอนุมัติ และเห็นกำหนดคืนที่บันทึกหลังอนุมัติ', async () => {
+    // Given อุปกรณ์มีพอและนักศึกษาไม่มีรายการค้างคืน
+    const client = {
+      listPendingLoanRequests: vi.fn().mockResolvedValueOnce({ items: [PENDING] }).mockResolvedValue({ items: [] }),
+      approveLoanRequest: vi.fn().mockResolvedValue({
+        request_id: 'REQ-0001',
+        equipment_name: 'อุปกรณ์ทดสอบ',
+        quantity: 1,
+        available_count: 2,
+        due_date: '2026-11-13',
+      }),
+    }
+    render(<StaffLoanApprovalPage client={client} />)
+    fireEvent.click(await screen.findByRole('button', { name: /นักศึกษาทดสอบ 1/ }))
+    expect(screen.getByText('กำหนดคืน (due date)')).toBeTruthy()
+    expect(screen.getByText(/13 พ\.ย\. 2569/)).toBeTruthy()
+
+    // When เจ้าหน้าที่อนุมัติการยืม
+    fireEvent.click(screen.getByRole('button', { name: 'อนุมัติการยืม' }))
+
+    // Then ระบบบันทึกการยืมพร้อมกำหนดคืน
+    expect(await screen.findByText('บันทึกการยืมแล้ว')).toBeTruthy()
+    const saved = within(screen.getByLabelText('กำหนดคืนที่บันทึก'))
+    expect(saved.getByText('กำหนดคืน')).toBeTruthy()
+    expect(saved.getByText(/13 พ\.ย\. 2569/)).toBeTruthy()
   })
 })

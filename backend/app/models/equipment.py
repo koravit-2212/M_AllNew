@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import threading
 from dataclasses import dataclass, field
+from datetime import date
 
 from app.config import EQUIPMENT_SEED_DATA, EQUIPMENT_STUDENT_SEED_DATA
 
@@ -41,7 +42,7 @@ class LoanRequest:
 
 @dataclass
 class LoanRecord:
-    """รองรับ FR-EQP-04: การยืมที่บันทึกหลังเจ้าหน้าที่อนุมัติ (due date รอ T-13)"""
+    """รองรับ FR-EQP-04, CON-LNS-02: การยืมที่บันทึกหลังเจ้าหน้าที่อนุมัติ พร้อมวันที่ยืมและ due date"""
 
     loan_id: str
     request_id: str
@@ -49,6 +50,8 @@ class LoanRecord:
     equipment_type_id: str
     quantity: int
     approved_by: str
+    loan_date: date | None = None
+    due_date: date | None = None
 
 
 @dataclass

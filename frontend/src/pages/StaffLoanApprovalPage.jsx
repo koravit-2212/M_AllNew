@@ -4,7 +4,7 @@ import { api } from '../api/client.js'
 
 // FR-EQP-03, FR-EQP-04, FR-EQP-06, NFR-USB-01
 // หน้าเจ้าหน้าที่ตรวจสอบและอนุมัติคำขอยืมอุปกรณ์ (UI-EQP-02)
-// ช่อง "กำหนดคืน (due date)" อยู่ใน T-13 ส่วนการบล็อกและปุ่ม override (ASM-02) อยู่ใน T-14 รอคำตอบทีม
+// FR-EQP-04 (Q-03): แสดงกำหนดคืนก่อนและหลังอนุมัติ ส่วนการบล็อกและปุ่ม override (ASM-02) อยู่ใน T-14
 
 function Row({ label, children }) {
   return (
@@ -13,6 +13,18 @@ function Row({ label, children }) {
       <span className="text-right">{children}</span>
     </div>
   )
+}
+
+// FR-EQP-04: แสดง due date (YYYY-MM-DD จากหลังบ้าน) เป็นวันที่แบบไทย เช่น "ศ. 13 พ.ย. 2569"
+function formatDueDate(isoDate) {
+  if (!isoDate) return ''
+  const [year, month, day] = isoDate.split('-').map(Number)
+  return new Date(year, month - 1, day).toLocaleDateString('th-TH', {
+    weekday: 'short',
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  })
 }
 
 // FR-EQP-06: ข้อความรายการค้างคืนแต่ละรายการ ตาม UI-EQP-02 เช่น "ร่ม — เกินกำหนด 2 วัน"
@@ -48,7 +60,7 @@ export default function StaffLoanApprovalPage({ client = api }) {
     setApproving(true)
     try {
       const loan = await client.approveLoanRequest(selected.request_id)
-      setResult({ name: loan.equipment_name, availableCount: loan.available_count })
+      setResult({ name: loan.equipment_name, availableCount: loan.available_count, dueDate: loan.due_date })
       setSelectedId(null)
       await loadRequests()
     } catch {
@@ -69,6 +81,11 @@ export default function StaffLoanApprovalPage({ client = api }) {
             <small className="mt-1 block text-sm">
               {result.name}คงเหลือ {result.availableCount}
             </small>
+          </div>
+        )}
+        {result?.dueDate && (
+          <div className="mt-3 rounded-xl border border-slate-200 px-4 py-3 text-sm" aria-label="กำหนดคืนที่บันทึก">
+            <Row label="กำหนดคืน">{formatDueDate(result.dueDate)}</Row>
           </div>
         )}
 
@@ -106,6 +123,11 @@ export default function StaffLoanApprovalPage({ client = api }) {
               </Row>
               {selected.outstanding_items.length === 0 && <Row label="รายการค้างคืน">ไม่มี</Row>}
             </div>
+            {selected.due_date && (
+              <div className="mt-3 rounded-xl border border-slate-200 px-4 py-3 text-sm">
+                <Row label="กำหนดคืน (due date)">{formatDueDate(selected.due_date)}</Row>
+              </div>
+            )}
             {selected.outstanding_items.length > 0 && (
               <div className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900" role="alert">
                 <b className="block text-base">มีรายการค้างคืน</b>

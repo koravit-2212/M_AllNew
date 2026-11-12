@@ -948,3 +948,12 @@
 - เพิ่มรายการใน `specs/CHANGELOG.md`
 - เปลี่ยน T-13, T-14 ใน `tasks.md` เป็น "พร้อมทำ"
 - ทีมต้องตรวจถ้อยคำ Q-03 ถึง Q-05 ใน spec
+
+## 2026-11-12 คำสั่ง: /implement-all 007-equipment เฟสรอคำตอบ — T-13
+
+- AI หยุดถาม: T-13 ต้องแตะ `models/equipment.py`, `api/equipment.py`, `StaffLoanApprovalPage.test.jsx` ซึ่งไม่อยู่ในช่องไฟล์ที่แตะ ทีมตอบ "เพิ่ม 3 ไฟล์ใน T-13 แล้วทำต่อ" (T-14 เพิ่ม `client.js` และ test หน้าจอด้วย) แก้ช่องไฟล์ที่แตะใน tasks.md แล้ว
+- task: T-13 กำหนด due date ตามประเภทอุปกรณ์เมื่ออนุมัติ
+- ไฟล์ที่แตะ: `backend/app/config.py`, `backend/app/models/equipment.py`, `backend/app/services/equipment_service.py`, `backend/app/api/equipment.py`, `frontend/src/pages/StaffLoanApprovalPage.jsx`, `frontend/src/__tests__/StaffLoanApprovalPage.test.jsx`, `backend/tests/test_AC_EQP_02_due_date.py`
+- ผล test: หลังบ้าน 24 passed, หน้าจอ 15 passed
+- `EQUIPMENT_LOAN_DAYS` ใน config ทุกประเภท 1 วัน (Q-03) นับวันตาม `LIBRARY_TIMEZONE = 'Asia/Bangkok'` อ้าง glossary
+- หน้าเจ้าหน้าที่แสดง "กำหนดคืน (due date)" ก่อนอนุมัติ และ "กำหนดคืน" หลังอนุมัติ ตาม UI-EQP-02 รูปแบบวันที่จาก th-TH เช่น "ศ. 13 พ.ย. 2569" (mockup ไม่มีจุดหลังตัวย่อวัน)

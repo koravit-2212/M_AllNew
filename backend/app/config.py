@@ -53,7 +53,6 @@ BOOK_SEARCH_SEED_DATA = [
 
 # FR-EQP-01, FR-EQP-02 ประเภทอุปกรณ์ (ปลั๊กไฟ ร่ม ถุงผ้า) พร้อมจำนวนคงเหลือตัวอย่าง
 # จำนวนคงเหลือเป็นข้อมูลตัวอย่างสำหรับลองระบบ (ทีมเลือกเอง ไม่ได้มาจาก spec)
-# due date ต่อประเภท (ASM-03) ยังไม่ใส่ รอคำตอบทีม ดู T-13 ใน specs/007-equipment/tasks.md
 EQUIPMENT_SEED_DATA = [
     {'equipment_type_id': 'EQ-PLUG', 'name': 'ปลั๊กไฟ', 'available_count': 4},
     {'equipment_type_id': 'EQ-UMBRELLA', 'name': 'ร่ม', 'available_count': 2},
@@ -66,3 +65,13 @@ EQUIPMENT_STUDENT_SEED_DATA = [
     {'student_id': '64000001', 'name': 'นักศึกษาตัวอย่าง ก', 'outstanding_items': []},
     {'student_id': '64000002', 'name': 'นักศึกษาตัวอย่าง ข', 'outstanding_items': [{'item': 'ร่ม', 'days_overdue': 2}]},
 ]
+
+# FR-EQP-04, ASM-03, Q-03: จำนวนวันที่ยืมได้ของแต่ละประเภท นับจากวันที่ยืม (ทีมตอบ: ทุกประเภท 1 วัน)
+EQUIPMENT_LOAN_DAYS = {
+    'EQ-PLUG': 1,
+    'EQ-UMBRELLA': 1,
+    'EQ-BAG': 1,
+}
+
+# FR-EQP-04: เขตเวลาที่ใช้นับ "วันที่ยืม" ตาม glossary (วันเดียวกัน = Asia/Bangkok)
+LIBRARY_TIMEZONE = 'Asia/Bangkok'

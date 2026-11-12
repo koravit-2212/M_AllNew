@@ -184,16 +184,16 @@
 ### T-13 กำหนด due date ตามประเภทอุปกรณ์เมื่ออนุมัติ
 - รองรับ: FR-EQP-04 (ส่วน due date), CON-LNS-02, ASM-03
 - ตรวจด้วย: AC-EQP-02
-- ไฟล์ที่แตะ: `backend/app/config.py`, `backend/app/services/equipment_service.py`, `frontend/src/pages/StaffLoanApprovalPage.jsx`, `backend/tests/test_AC_EQP_02_due_date.py`
+- ไฟล์ที่แตะ: `backend/app/config.py`, `backend/app/models/equipment.py`, `backend/app/services/equipment_service.py`, `backend/app/api/equipment.py`, `frontend/src/pages/StaffLoanApprovalPage.jsx`, `frontend/src/__tests__/StaffLoanApprovalPage.test.jsx`, `backend/tests/test_AC_EQP_02_due_date.py` (ทีมอนุมัติเพิ่ม 2569-11-12)
 - แบบหน้าจอ: UI-EQP-02 `mockups/UI-EQP-02-staff-approve.html` (ช่อง "กำหนดคืน (due date)")
 - ต้องทำหลัง: T-08
 - เสร็จเมื่อ: test due date ของแต่ละประเภทอุปกรณ์ผ่าน ตามค่าที่ทีมตอบ
-- สถานะ: พร้อมทำ (Q-03 ตอบแล้ว)
+- สถานะ: เสร็จ รอทีมตรวจ
 
 ### T-14 บล็อกการยืมเมื่อมีรายการค้างคืน และให้เจ้าหน้าที่ปลดล็อก (override)
 - รองรับ: FR-EQP-06, ASM-02
 - ตรวจด้วย: AC-EQP-04
-- ไฟล์ที่แตะ: `backend/app/services/equipment_service.py`, `backend/app/api/equipment.py`, `frontend/src/pages/StaffLoanApprovalPage.jsx`, `backend/tests/test_AC_EQP_04_block_and_override.py`
+- ไฟล์ที่แตะ: `backend/app/services/equipment_service.py`, `backend/app/api/equipment.py`, `frontend/src/api/client.js`, `frontend/src/pages/StaffLoanApprovalPage.jsx`, `frontend/src/__tests__/StaffLoanApprovalPage.test.jsx`, `backend/tests/test_AC_EQP_04_block_and_override.py` (ทีมอนุมัติเพิ่ม 2569-11-12)
 - แบบหน้าจอ: UI-EQP-02 `mockups/UI-EQP-02-staff-approve.html` (ปุ่ม "ปลดล็อก (override) เป็นกรณีพิเศษ")
 - ต้องทำหลัง: T-12
 - เสร็จเมื่อ: test บล็อกและ override ผ่าน ตามกติกาที่ทีมตอบ

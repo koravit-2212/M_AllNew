@@ -1,5 +1,9 @@
 from __future__ import annotations
 
+from datetime import date, datetime, timedelta
+from zoneinfo import ZoneInfo
+
+from app.config import EQUIPMENT_LOAN_DAYS, LIBRARY_TIMEZONE
 from app.models.equipment import EquipmentStore, LoanRecord, LoanRequest
 
 # FR-EQP-02, FR-EQP-03, FR-EQP-04, ASM-01
@@ -50,13 +54,25 @@ def create_loan_request(store: EquipmentStore, student_id: str, equipment_type_i
         return request
 
 
+def library_today() -> date:
+    """FR-EQP-04: วันที่ปัจจุบันตามเขตเวลาของห้องสมุด"""
+
+    return datetime.now(ZoneInfo(LIBRARY_TIMEZONE)).date()
+
+
+def compute_due_date(equipment_type_id: str, loan_date: date) -> date:
+    """FR-EQP-04, ASM-03, Q-03, CON-LNS-02: กำหนดคืนตามประเภทอุปกรณ์ = วันที่ยืม + จำนวนวันใน config"""
+
+    return loan_date + timedelta(days=EQUIPMENT_LOAN_DAYS[equipment_type_id])
+
+
 def list_pending_requests(store: EquipmentStore) -> list[LoanRequest]:
     """FR-EQP-03: คำขอที่รอเจ้าหน้าที่ตรวจสอบ (หน้าจอเจ้าหน้าที่ตาม plan.md ข้อ 4 Pending requests list)"""
 
     return [request for request in store.requests.values() if request.status == 'pending']
 
 
-def get_request_detail(store: EquipmentStore, request_id: str) -> dict:
+def get_request_detail(store: EquipmentStore, request_id: str, today: date | None = None) -> dict:
     """FR-EQP-03, FR-EQP-06, CON-LNS-02: ข้อมูลที่เจ้าหน้าที่ใช้ตรวจก่อนอนุมัติ คือนักศึกษา อุปกรณ์ และรายการค้างคืน
     คำขอของนักศึกษาที่มีรายการค้างคืนยังเป็น pending ไม่อนุมัติเอง ให้เจ้าหน้าที่ตรวจก่อนตัดสินใจ (FR-EQP-06)
     การบล็อกและ override ตาม ASM-02 ยังไม่ทำ รอ T-14
@@ -67,6 +83,8 @@ def get_request_detail(store: EquipmentStore, request_id: str) -> dict:
         raise RequestNotFound(request_id)
     student = store.students[request.student_id]
     equipment = store.equipment_types[request.equipment_type_id]
+    # FR-EQP-04: กำหนดคืนถ้าอนุมัติวันนี้ ให้เจ้าหน้าที่เห็นก่อนอนุมัติ (UI-EQP-02)
+    due_date = compute_due_date(equipment.equipment_type_id, today or library_today())
     return {
         'request_id': request.request_id,
         'status': request.status,
@@ -79,13 +97,14 @@ def get_request_detail(store: EquipmentStore, request_id: str) -> dict:
             'name': equipment.name,
             'available_count': equipment.available_count,
         },
+        'due_date': due_date.isoformat(),
     }
 
 
-def approve_request(store: EquipmentStore, request_id: str, approver_id: str) -> LoanRecord:
+def approve_request(store: EquipmentStore, request_id: str, approver_id: str, today: date | None = None) -> LoanRecord:
     """FR-EQP-04, CON-LNS-02: เจ้าหน้าที่อนุมัติ ระบบบันทึกการยืมและลดจำนวนคงเหลือ
     ตรวจจำนวนอีกครั้งภายใต้ lock เพื่อไม่ให้คงเหลือติดลบ (FR-EQP-02)
-    due date ตามประเภทอุปกรณ์ยังไม่ทำ รอ T-13
+    กำหนด due date ตามประเภทอุปกรณ์ (ASM-03, Q-03)
     """
 
     with store.lock:
@@ -98,6 +117,7 @@ def approve_request(store: EquipmentStore, request_id: str, approver_id: str) ->
         if equipment.available_count < request.quantity:
             raise InsufficientStock(request.equipment_type_id)
 
+        loan_date = today or library_today()
         equipment.available_count -= request.quantity
         request.status = 'approved'
         loan = LoanRecord(
@@ -107,6 +127,8 @@ def approve_request(store: EquipmentStore, request_id: str, approver_id: str) ->
             equipment_type_id=request.equipment_type_id,
             quantity=request.quantity,
             approved_by=approver_id,
+            loan_date=loan_date,
+            due_date=compute_due_date(request.equipment_type_id, loan_date),
         )
         store.loans.append(loan)
         return loan
