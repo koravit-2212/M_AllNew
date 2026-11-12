@@ -2,26 +2,40 @@ import { useEffect, useState } from 'react'
 
 import { api } from '../api/client.js'
 
-// FR-EQP-01, FR-EQP-02, NFR-USB-01
-// หน้ายืมอุปกรณ์ของนักศึกษา (UI-EQP-01) แสดงประเภทอุปกรณ์พร้อมจำนวนคงเหลือให้เลือก
-// ปุ่มส่งคำขอเพิ่มใน T-07 และสถานะอุปกรณ์หมดเพิ่มใน T-10
+// FR-EQP-01, FR-EQP-02, ASM-01, NFR-USB-01
+// หน้ายืมอุปกรณ์ของนักศึกษา (UI-EQP-01) แสดงประเภทอุปกรณ์ให้เลือก แล้วส่งคำขอให้เจ้าหน้าที่อนุมัติ
+// สถานะอุปกรณ์หมดเพิ่มใน T-10
+
+// UI-EQP-01 ไม่มีช่องเลือกจำนวน ส่งคำขอครั้งละ 1 ชิ้นตาม mockup "× 1" (ทีมเลือกเอง ไม่ได้มาจาก spec)
+const REQUEST_QUANTITY = 1
+
 export default function EquipmentLoanPage({ client = api }) {
   const [items, setItems] = useState([])
+  const [students, setStudents] = useState([])
+  const [studentId, setStudentId] = useState('')
   const [selectedId, setSelectedId] = useState(null)
+  const [submitted, setSubmitted] = useState(null)
+  const [submitting, setSubmitting] = useState(false)
 
-  // FR-EQP-01: โหลดรายการประเภทอุปกรณ์จากหลังบ้านเมื่อเข้าหน้า
+  // FR-EQP-01: โหลดรายการประเภทอุปกรณ์ และนักศึกษาตัวอย่าง (ชั่วคราวจนกว่าจะมีล็อกอิน) เมื่อเข้าหน้า
   useEffect(() => {
     let active = true
     const load = async () => {
       try {
         const payload = await client.listEquipmentTypes()
+        if (active) setItems(payload?.items ?? [])
+      } catch {
+        if (active) setItems([])
+      }
+      try {
+        const payload = await client.listStudents()
         if (active) {
-          setItems(payload?.items ?? [])
+          const list = payload?.items ?? []
+          setStudents(list)
+          setStudentId((current) => current || list[0]?.student_id || '')
         }
       } catch {
-        if (active) {
-          setItems([])
-        }
+        if (active) setStudents([])
       }
     }
     load()
@@ -30,10 +44,68 @@ export default function EquipmentLoanPage({ client = api }) {
     }
   }, [client])
 
+  const selectedItem = items.find((item) => item.equipment_type_id === selectedId)
+
+  // FR-EQP-02, ASM-01: ส่งคำขอยืม ผลคือรอเจ้าหน้าที่ตรวจสอบและอนุมัติ ไม่ใช่ยืมได้ทันที
+  const submitRequest = async () => {
+    if (!selectedItem || !studentId) return
+    setSubmitting(true)
+    try {
+      const request = await client.createLoanRequest({
+        studentId,
+        equipmentTypeId: selectedItem.equipment_type_id,
+        quantity: REQUEST_QUANTITY,
+      })
+      setSubmitted({ name: selectedItem.name, quantity: request?.quantity ?? REQUEST_QUANTITY })
+    } catch {
+      setSubmitted(null)
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  if (submitted) {
+    return (
+      <main className="mx-auto max-w-4xl p-4 md:p-8">
+        <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm md:p-8">
+          <h1 className="text-2xl font-bold text-slate-800">ยืมอุปกรณ์</h1>
+          <div className="mt-4 rounded-2xl border border-sky-200 bg-sky-50 p-6 text-center text-sky-900" role="status">
+            <b className="block text-xl">ส่งคำขอแล้ว</b>
+            <small className="mt-1 block text-sm">รอเจ้าหน้าที่ตรวจสอบและอนุมัติ</small>
+          </div>
+          <div className="mt-3 flex justify-between gap-3 rounded-xl border border-slate-200 px-4 py-3 text-sm">
+            <span className="text-slate-500">อุปกรณ์</span>
+            <span>
+              {submitted.name} × {submitted.quantity}
+            </span>
+          </div>
+        </section>
+      </main>
+    )
+  }
+
   return (
     <main className="mx-auto max-w-4xl p-4 md:p-8">
       <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm md:p-8">
         <h1 className="text-2xl font-bold text-slate-800">ยืมอุปกรณ์</h1>
+
+        {/* ชั่วคราว: เลือกนักศึกษาตัวอย่าง จนกว่าจะมีล็อกอิน (คำตอบทีมข้อ 3 ใน tasks.md) */}
+        <label htmlFor="equipment-student" className="mt-4 block text-sm text-slate-500">
+          นักศึกษา
+        </label>
+        <select
+          id="equipment-student"
+          value={studentId}
+          onChange={(event) => setStudentId(event.target.value)}
+          className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2"
+        >
+          {students.map((student) => (
+            <option key={student.student_id} value={student.student_id}>
+              {student.name} ({student.student_id})
+            </option>
+          ))}
+        </select>
+
         <p id="equipment-choice-label" className="mt-4 text-sm text-slate-500">
           เลือกอุปกรณ์
         </p>
@@ -62,6 +134,16 @@ export default function EquipmentLoanPage({ client = api }) {
             )
           })}
         </ul>
+
+        <p className="mt-3 text-xs text-slate-500">เจ้าหน้าที่จะตรวจสอบและอนุมัติคำขอก่อนยืมเสมอ</p>
+        <button
+          type="button"
+          onClick={submitRequest}
+          disabled={!selectedItem || !studentId || submitting}
+          className="mt-4 w-full rounded-xl bg-teal-700 px-4 py-3 font-bold text-white disabled:bg-slate-300"
+        >
+          ส่งคำขอยืม
+        </button>
       </section>
     </main>
   )

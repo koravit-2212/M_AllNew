@@ -27,6 +27,26 @@ export const api = {
     }
     return res.json()
   },
+  // FR-EQP-03: นักศึกษาตัวอย่างให้เลือก (ชั่วคราวจนกว่าจะมีล็อกอิน 001/002)
+  async listStudents() {
+    const res = await fetch(`${BASE}/students`)
+    if (!res.ok) {
+      throw new Error(`Students request failed: ${res.status}`)
+    }
+    return res.json()
+  },
+  // FR-EQP-02, ASM-01: ส่งคำขอยืม ได้คำขอสถานะรออนุมัติ (POST /api/loan-requests)
+  async createLoanRequest({ studentId, equipmentTypeId, quantity }) {
+    const res = await fetch(`${BASE}/loan-requests`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ student_id: studentId, equipment_type_id: equipmentTypeId, quantity }),
+    })
+    if (!res.ok) {
+      throw new Error(`Loan request failed: ${res.status}`)
+    }
+    return res.json()
+  },
   async getSlots({ dateFrom, packageCode }) {
     const q = new URLSearchParams({ date_from: dateFrom, package_code: packageCode })
     const res = await fetch(`${BASE}/slots?${q}`)
