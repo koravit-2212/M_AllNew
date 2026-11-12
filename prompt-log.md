@@ -847,3 +847,11 @@
 - ไฟล์ที่แตะ: `backend/app/api/equipment.py`, `backend/app/main.py`, `backend/tests/test_AC_EQP_01_equipment_types.py` (และ `specs/007-equipment/tasks.md` สถานะ)
 - ผล test: หลังบ้าน 12 passed, หน้าจอ 8 passed
 - คืนทุกประเภทอุปกรณ์รวมที่คงเหลือ 0 เพื่อให้หน้าจอแสดงป้าย "หมด" ได้ใน AC-EQP-03
+
+## 2026-11-12 คำสั่ง: /implement-all 007-equipment เฟส 1 — T-04
+
+- task: T-04 แสดงรายการอุปกรณ์ให้นักศึกษาเลือก
+- ไฟล์ที่แตะ: `frontend/src/api/client.js`, `frontend/src/pages/EquipmentLoanPage.jsx`, `frontend/src/__tests__/EquipmentLoanPage.test.jsx` (และ `specs/007-equipment/tasks.md` สถานะ)
+- ผล test: หลังบ้าน 12 passed, หน้าจอ 9 passed
+- ใช้ข้อความจาก UI-EQP-01 สถานะปกติ: "เลือกอุปกรณ์", "คงเหลือ N", ป้าย "ว่าง" ไม่ใส่ปุ่ม "ส่งคำขอยืม" (T-07) และป้าย "หมด" (T-10)
+- ถ้าโหลดรายการไม่สำเร็จ หน้าจอแสดงรายการว่างโดยไม่มีข้อความแจ้ง เพราะ spec ไม่มีข้อความกรณีนี้ (ไม่เพิ่มเอง)

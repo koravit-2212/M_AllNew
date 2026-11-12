@@ -19,6 +19,14 @@ export const api = {
     }
     return res.json()
   },
+  // FR-EQP-01, FR-EQP-02: ประเภทอุปกรณ์ที่ยืมได้พร้อมจำนวนคงเหลือ (GET /api/equipment-types)
+  async listEquipmentTypes() {
+    const res = await fetch(`${BASE}/equipment-types`)
+    if (!res.ok) {
+      throw new Error(`Equipment types request failed: ${res.status}`)
+    }
+    return res.json()
+  },
   async getSlots({ dateFrom, packageCode }) {
     const q = new URLSearchParams({ date_from: dateFrom, package_code: packageCode })
     const res = await fetch(`${BASE}/slots?${q}`)
