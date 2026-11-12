@@ -1,11 +1,13 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel, Field
 
+from app.config import PRINT_ALLOWED_EXTENSIONS, PRINT_MAX_FILE_SIZE_MB
 from app.models.printing import PrintStore, build_seed_print_store
 from app.services.printing_service import (
     FileNotFound,
     InvalidColorMode,
     PrinterNotReady,
+    UnsupportedFile,
     allowed_color_modes,
     calculate_cost,
     get_file,
@@ -38,9 +40,22 @@ class UploadIn(BaseModel):
 
 @router.post('/print/upload', status_code=201)
 def upload_file(body: UploadIn, store: PrintStore = Depends(get_print_store)) -> dict:
-    """FR-PRT-01: รับไฟล์ที่ผู้ใช้เลือก ได้ file_id ไปใช้เลือกตัวเลือกการพิมพ์"""
+    """FR-PRT-01: รับไฟล์ที่ผู้ใช้เลือก ได้ file_id ไปใช้เลือกตัวเลือกการพิมพ์
+    FR-PRT-04: ไฟล์ไม่รองรับ ตอบ 415 และไม่ได้ file_id
+    """
 
-    record = register_file(store, body.filename, body.content_type, body.size_bytes)
+    try:
+        record = register_file(store, body.filename, body.content_type, body.size_bytes)
+    except UnsupportedFile:
+        # FR-PRT-04, CON-FILE-01: แจ้งเตือนพร้อมชนิดและขนาดที่รองรับ (ค่าจาก config)
+        raise HTTPException(
+            status_code=415,
+            detail={
+                'message': 'ไม่รองรับไฟล์ชนิดนี้',
+                'allowed_extensions': list(PRINT_ALLOWED_EXTENSIONS),
+                'max_size_mb': PRINT_MAX_FILE_SIZE_MB,
+            },
+        )
     # Q-05: ระบบไม่นับหน้าจากไฟล์ ผู้ใช้กรอกเอง
     return {'file_id': record.file_id, 'filename': record.filename, 'size_bytes': record.size_bytes, 'pages_detected': None}
 

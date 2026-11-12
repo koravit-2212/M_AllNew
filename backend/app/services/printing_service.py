@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from app.config import PRINT_RATE_PER_PAGE_BAHT
+from app.config import PRINT_ALLOWED_EXTENSIONS, PRINT_MAX_FILE_SIZE_BYTES, PRINT_RATE_PER_PAGE_BAHT
 from app.models.printing import PrintFile, PrintJob, PrintStore
 
 # FR-PRT-01, FR-PRT-02, FR-PRT-03, IF-PRN-01
@@ -8,6 +8,10 @@ from app.models.printing import PrintFile, PrintJob, PrintStore
 
 # ชื่อชนิดการพิมพ์ที่แสดงบนหน้าจอ (ข้อความจาก UI-PRT-01) อัตราอยู่ใน config (ASM-03)
 COLOR_MODE_LABELS = {'BW': 'ขาว-ดำ', 'Color': 'สี'}
+
+
+class UnsupportedFile(Exception):
+    """ไฟล์ชนิดหรือขนาดไม่ตรง CON-FILE-01 (FR-PRT-04)"""
 
 
 class FileNotFound(Exception):
@@ -22,8 +26,23 @@ class InvalidColorMode(Exception):
     """ชนิดการพิมพ์ไม่อยู่ในตัวเลือก"""
 
 
+def file_extension(filename: str) -> str:
+    return filename.rsplit('.', 1)[-1].lower() if '.' in filename else ''
+
+
+def validate_file(filename: str, size_bytes: int) -> None:
+    """FR-PRT-04, CON-FILE-01: รองรับเฉพาะ PDF, DOCX, PPTX, XLSX, JPG, PNG ขนาดไม่เกิน 50 MB"""
+
+    if file_extension(filename) not in PRINT_ALLOWED_EXTENSIONS or size_bytes > PRINT_MAX_FILE_SIZE_BYTES:
+        raise UnsupportedFile(filename)
+
+
 def register_file(store: PrintStore, filename: str, content_type: str, size_bytes: int) -> PrintFile:
-    """FR-PRT-01, Q-07: บันทึกข้อมูลไฟล์ที่ผู้ใช้เลือก (ไม่เก็บเนื้อไฟล์)"""
+    """FR-PRT-01, Q-07: บันทึกข้อมูลไฟล์ที่ผู้ใช้เลือก (ไม่เก็บเนื้อไฟล์)
+    FR-PRT-04: ไฟล์ไม่รองรับ ไม่บันทึก และไม่ได้ file_id จึงดำเนินการพิมพ์ต่อไม่ได้
+    """
+
+    validate_file(filename, size_bytes)
 
     file_id = f'FILE-{len(store.files) + 1:04d}'
     record = PrintFile(file_id=file_id, filename=filename, content_type=content_type, size_bytes=size_bytes)
