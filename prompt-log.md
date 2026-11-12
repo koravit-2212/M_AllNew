@@ -829,3 +829,10 @@
 - task: T-01 กำหนดค่าการพิมพ์ใน config และสร้างที่เก็บงานพิมพ์กับ spooler จำลอง
 - ไฟล์ที่แตะ: `backend/app/config.py`, `backend/app/models/printing.py`, `backend/tests/test_PRT_T01_print_store.py`
 - ผล test: หลังบ้าน 10 passed, หน้าจอ 7 passed
+
+## 2026-11-12 คำสั่ง: /implement-all specs/006-printing/tasks.md เฟส 0 — T-02
+
+- task: T-02 เพิ่มเมนูไปหน้าปริ้นเอกสารใน App.jsx โดยไม่ลบหน้าเดิม
+- ไฟล์ที่แตะ: `frontend/src/App.jsx`, `frontend/src/pages/PrintPage.jsx`, `frontend/src/__tests__/App.test.jsx`
+- ผล test: หลังบ้าน 10 passed, หน้าจอ 8 passed
+- เมนูหน้าเดิมชื่อ "หนังสือ" (ไม่ใช้ "ค้นหาหนังสือ" เพราะ test เดิม `setup.test.jsx` หาข้อความนี้แบบมีได้ตัวเดียว) และจัดเป็นอาร์เรย์ MENUS แบบเดียวกับ branch 004 และ 007 เพื่อให้รวมกันง่าย
