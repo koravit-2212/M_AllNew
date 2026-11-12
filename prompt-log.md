@@ -255,6 +255,20 @@
   - AC ที่ทดสอบยาก: `AC-SRC-01` (performance & concurrency ≥500) และ `AC-SRC-03` (จำลอง partial DB responses)
   - สิ่งที่อยากเดาแต่ไม่ได้เดา: การเลือก Search engine (Elasticsearch vs DB FTS), นโยบาย sync frequency, TTL ของ cache
 
+---
+
+## 2026-11-12 12:00 คำสั่ง: /tasks
+
+- เครื่องมือ: Copilot ใน Codespaces
+- ไฟล์: specs/003-searchBook/spec.md
+- ผลลัพธ์: สร้างไฟล์ `specs/003-searchBook/tasks.md` พร้อมแยกงานเป็น 5 เฟส และ 11 task
+- สรุปผลลัพธ์:
+  - เฟสทั้งหมด: 5 เฟส
+  - task ทั้งหมด: 11 task
+  - task ที่รอ Q-xx: 0 task
+  - เฟสแรกที่ลองใช้งานได้จริง: เฟส 1 (`AC-SRC-01`)
+- ข้อสังเกต: feature นี้ไม่มี Open Questions ใน spec.md ปัจจุบัน จึงไม่มี task ที่กำหนดสถานะ "รอ Q-xx"
+- ตารางตรวจความครบและ traceability ได้รวมไว้ใน `tasks.md` เสร็จสิ้น
 
 ---
 
