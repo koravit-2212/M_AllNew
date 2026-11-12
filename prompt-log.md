@@ -854,3 +854,8 @@
   - ไฟล์ที่แตะ: `backend/app/services/printing_service.py`, `backend/app/api/printing.py`, `backend/tests/test_AC_PRT_02_print_flow.py`
   - ผล test: หลังบ้าน 14 passed
   - POST /api/print/submit ได้ status "sent" spooler จำลองได้รับงานพร้อมจำนวนหน้า × ชุด GET /api/print/jobs/{id} อ่านกลับได้ ไม่ตรวจโควตา (Q-04) ยังไม่ตรวจเครื่องไม่พร้อม (T-07)
+- AI เพิ่ม Q-09 (ข้อความเมื่อส่งงานไม่สำเร็จด้วยเหตุอื่น "ส่งงานพิมพ์ไม่สำเร็จ กรุณาลองใหม่") ใน spec 006
+- T-06 ทำขั้น "ยืนยัน" และหน้าผล "ส่งงานพิมพ์แล้ว"
+  - ไฟล์ที่แตะ: `frontend/src/api/client.js`, `frontend/src/pages/PrintPage.jsx`, `frontend/src/__tests__/PrintPage.test.jsx`
+  - ผล test: หลังบ้าน 14 passed, หน้าจอ 11 passed
+  - ข้อความตาม UI-PRT-01: "ถัดไป", "ส่งงานพิมพ์แล้ว", "บันทึกข้อมูลการใช้บริการแล้ว", การ์ด ไฟล์ / จำนวน / ค่าใช้บริการ ขั้นยืนยันใช้การ์ดเดียวกัน + "ยืนยันการพิมพ์" และ "กลับ"

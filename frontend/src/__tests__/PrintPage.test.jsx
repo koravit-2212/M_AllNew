@@ -1,4 +1,5 @@
 // T-04 (FR-PRT-01, FR-PRT-02, NFR-USB-01) ตรวจด้วย AC-PRT-01
+// T-06 (FR-PRT-03, NFR-USB-01) ตรวจด้วย AC-PRT-02
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { vi } from 'vitest'
 
@@ -9,8 +10,9 @@ const MODES = [
   { code: 'Color', label: 'สี', rate_per_page: 5 },
 ]
 
-function makeClient() {
+function makeClient(submitPrintJob = vi.fn().mockResolvedValue({ printjob_id: 'JOB-0001', status: 'sent', filename: 'report.pdf', total_pages: 24, total_cost: 24 })) {
   return {
+    submitPrintJob,
     uploadPrintFile: vi.fn().mockResolvedValue({ file_id: 'FILE-0001', filename: 'report.pdf', size_bytes: 1258291, pages_detected: null }),
     getPrintOptions: vi.fn().mockImplementation(async ({ pages, copies, colorMode }) => ({
       file_id: 'FILE-0001',
@@ -50,5 +52,43 @@ describe('AC-PRT-01 เห็นตัวเลือกการพิมพ์
     fireEvent.click(screen.getByLabelText('สี'))
     await waitFor(() => expect(cost.getByText('120 บาท')).toBeTruthy())
     expect(client.uploadPrintFile).toHaveBeenCalledWith({ filename: 'report.pdf', contentType: 'application/pdf', sizeBytes: 1258291 })
+  })
+})
+
+async function goToConfirm(client) {
+  render(<PrintPage client={client} />)
+  await chooseFile()
+  await screen.findByText('report.pdf (1.2 MB)')
+  fireEvent.change(screen.getByLabelText('จำนวนหน้า'), { target: { value: '12' } })
+  fireEvent.change(screen.getByLabelText('จำนวนชุด'), { target: { value: '2' } })
+  await waitFor(() => expect(screen.getByText('12 หน้า × 2 ชุด = 24 หน้า')).toBeTruthy())
+  fireEvent.click(screen.getByRole('button', { name: 'ถัดไป' }))
+}
+
+describe('AC-PRT-02 ส่งงานพิมพ์สำเร็จ', () => {
+  it('AC-PRT-02 กดยืนยันแล้วเห็นส่งงานพิมพ์แล้ว พร้อมชื่อไฟล์ จำนวนหน้ารวม และค่าใช้บริการ', async () => {
+    // Given เครื่องปริ้นพร้อมใช้งานและไฟล์รองรับ
+    const client = makeClient()
+    await goToConfirm(client)
+
+    // When นักศึกษายืนยันการพิมพ์
+    fireEvent.click(screen.getByRole('button', { name: 'ยืนยันการพิมพ์' }))
+
+    // Then ระบบส่งงานไปยังเครื่องปริ้น
+    await waitFor(() => expect(client.submitPrintJob).toHaveBeenCalledWith({ fileId: 'FILE-0001', pages: 12, copies: 2, colorMode: 'BW' }))
+    expect(await screen.findByText('ส่งงานพิมพ์แล้ว')).toBeTruthy()
+    expect(screen.getByText('บันทึกข้อมูลการใช้บริการแล้ว')).toBeTruthy()
+    const card = within(screen.getByLabelText('งานพิมพ์'))
+    expect(card.getByText('report.pdf')).toBeTruthy()
+    expect(card.getByText('24 หน้า')).toBeTruthy()
+    expect(card.getByText('24 บาท')).toBeTruthy()
+  })
+
+  it('AC-PRT-02 เหตุอื่น (เช่น เน็ตหลุด) เห็นส่งงานพิมพ์ไม่สำเร็จ กรุณาลองใหม่ (Q-09)', async () => {
+    const client = makeClient(vi.fn().mockRejectedValue(new TypeError('Failed to fetch')))
+    await goToConfirm(client)
+    fireEvent.click(screen.getByRole('button', { name: 'ยืนยันการพิมพ์' }))
+    expect(await screen.findByText('ส่งงานพิมพ์ไม่สำเร็จ กรุณาลองใหม่')).toBeTruthy()
+    expect(screen.queryByText('ส่งงานพิมพ์แล้ว')).toBeNull()
   })
 })

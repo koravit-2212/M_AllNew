@@ -2,9 +2,9 @@ import { useEffect, useState } from 'react'
 
 import { api } from '../api/client.js'
 
-// FR-PRT-01, FR-PRT-02, NFR-USB-01
-// หน้าปริ้นเอกสาร (UI-PRT-01) ขั้น 1 เลือกไฟล์ ชนิดการพิมพ์ จำนวนหน้า จำนวนชุด และเห็นค่าใช้บริการ
-// ขั้นยืนยันและผลเพิ่มใน T-06 เครื่องพิมพ์ไม่พร้อมเพิ่มใน T-08 ไฟล์ไม่รองรับเพิ่มใน T-10
+// FR-PRT-01, FR-PRT-02, FR-PRT-03, NFR-USB-01
+// หน้าปริ้นเอกสาร (UI-PRT-01) ขั้น 1 เลือกไฟล์และตัวเลือก ขั้น 2 ยืนยัน ขั้น 3 ผล
+// เครื่องพิมพ์ไม่พร้อมเพิ่มใน T-08 ไฟล์ไม่รองรับเพิ่มใน T-10
 
 const STEPS = ['1 เลือกไฟล์', '2 ยืนยัน', '3 ผล']
 
@@ -52,6 +52,12 @@ export default function PrintPage({ client = api }) {
   const [pagesInput, setPagesInput] = useState('1')
   const [copiesInput, setCopiesInput] = useState('1')
   const [options, setOptions] = useState(null)
+  // step: 'select' | 'confirm' | 'done'
+  const [step, setStep] = useState('select')
+  const [job, setJob] = useState(null)
+  // null | 'failed' (Q-09)
+  const [submitError, setSubmitError] = useState(null)
+  const [submitting, setSubmitting] = useState(false)
 
   const pages = toPositiveInt(pagesInput)
   const copies = toPositiveInt(copiesInput)
@@ -84,6 +90,81 @@ export default function PrintPage({ client = api }) {
       active = false
     }
   }, [client, file, pages, copies, colorMode])
+
+  // FR-PRT-03: ยืนยันการพิมพ์ ส่งงานไปเครื่องปริ้นและบันทึกการใช้บริการ
+  const submit = async () => {
+    if (!file || !options) return
+    setSubmitting(true)
+    setSubmitError(null)
+    try {
+      const result = await client.submitPrintJob({ fileId: file.id, pages: options.pages, copies: options.copies, colorMode: options.color_mode })
+      setJob({ ...result, filename: result.filename || file.name })
+      setStep('done')
+    } catch {
+      setSubmitError('failed')
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  if (step === 'done' && job) {
+    return (
+      <main className="mx-auto max-w-4xl p-4 md:p-8">
+        <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm md:p-8">
+          <h1 className="text-2xl font-bold text-slate-800">ปริ้นเอกสาร</h1>
+          <Steps current={2} />
+          <div className="mt-4 rounded-2xl border border-emerald-200 bg-emerald-50 p-6 text-center text-emerald-900" role="status">
+            <b className="block text-xl">ส่งงานพิมพ์แล้ว</b>
+            <small className="mt-1 block text-sm">บันทึกข้อมูลการใช้บริการแล้ว</small>
+          </div>
+          <div className="mt-3 rounded-xl border border-slate-200 px-4 py-3 text-sm" aria-label="งานพิมพ์">
+            <Row label="ไฟล์">{job.filename}</Row>
+            <Row label="จำนวน">{job.total_pages} หน้า</Row>
+            <Row label="ค่าใช้บริการ">{job.total_cost} บาท</Row>
+          </div>
+        </section>
+      </main>
+    )
+  }
+
+  if (step === 'confirm' && file && options) {
+    return (
+      <main className="mx-auto max-w-4xl p-4 md:p-8">
+        <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm md:p-8">
+          <h1 className="text-2xl font-bold text-slate-800">ปริ้นเอกสาร</h1>
+          <Steps current={1} />
+          {submitError === 'failed' && (
+            <div className="mt-4 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800" role="alert">
+              <b className="block text-base">ส่งงานพิมพ์ไม่สำเร็จ กรุณาลองใหม่</b>
+            </div>
+          )}
+          <div className="mt-3 rounded-xl border border-slate-200 px-4 py-3 text-sm" aria-label="งานพิมพ์">
+            <Row label="ไฟล์">{file.name}</Row>
+            <Row label="จำนวน">{options.total_pages} หน้า</Row>
+            <Row label="ค่าใช้บริการ">{options.estimated_cost} บาท</Row>
+          </div>
+          <button
+            type="button"
+            onClick={submit}
+            disabled={submitting}
+            className="mt-4 w-full rounded-xl bg-teal-700 px-4 py-3 font-bold text-white disabled:bg-slate-300"
+          >
+            ยืนยันการพิมพ์
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setStep('select')
+              setSubmitError(null)
+            }}
+            className="mt-2 w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-700"
+          >
+            กลับ
+          </button>
+        </section>
+      </main>
+    )
+  }
 
   return (
     <main className="mx-auto max-w-4xl p-4 md:p-8">
@@ -150,6 +231,15 @@ export default function PrintPage({ client = api }) {
             <Row label="ค่าใช้บริการ">{options.estimated_cost} บาท</Row>
           </div>
         )}
+
+        <button
+          type="button"
+          onClick={() => setStep('confirm')}
+          disabled={!file || !options}
+          className="mt-4 w-full rounded-xl bg-teal-700 px-4 py-3 font-bold text-white disabled:bg-slate-300"
+        >
+          ถัดไป
+        </button>
       </section>
     </main>
   )

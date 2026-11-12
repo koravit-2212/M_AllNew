@@ -43,6 +43,20 @@ export const api = {
     }
     return res.json()
   },
+  // FR-PRT-03: ยืนยันการพิมพ์ error มี .status ให้หน้าจอแยกเครื่องพิมพ์ไม่พร้อม (FR-PRT-05)
+  async submitPrintJob({ fileId, pages, copies, colorMode }) {
+    const res = await fetch(`${BASE}/print/submit`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ file_id: fileId, pages, copies, color_mode: colorMode }),
+    })
+    if (!res.ok) {
+      const error = new Error(`Print submit failed: ${res.status}`)
+      error.status = res.status
+      throw error
+    }
+    return res.json()
+  },
   async getSlots({ dateFrom, packageCode }) {
     const q = new URLSearchParams({ date_from: dateFrom, package_code: packageCode })
     const res = await fetch(`${BASE}/slots?${q}`)
