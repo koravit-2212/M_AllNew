@@ -836,3 +836,12 @@
 - ไฟล์ที่แตะ: `frontend/src/App.jsx`, `frontend/src/pages/PrintPage.jsx`, `frontend/src/__tests__/App.test.jsx`
 - ผล test: หลังบ้าน 10 passed, หน้าจอ 8 passed
 - เมนูหน้าเดิมชื่อ "หนังสือ" (ไม่ใช้ "ค้นหาหนังสือ" เพราะ test เดิม `setup.test.jsx` หาข้อความนี้แบบมีได้ตัวเดียว) และจัดเป็นอาร์เรย์ MENUS แบบเดียวกับ branch 004 และ 007 เพื่อให้รวมกันง่าย
+
+## 2026-11-12 คำสั่ง: "ทำ 004 006 ต่อเลยจนจบ" → /implement-all 006-printing
+
+- ทำต่อทุกเฟสโดยไม่หยุดที่จุดตรวจ (ทีมสั่ง "ตัดสินใจเองทั้งหมดได้เลย") task คงสถานะ "เสร็จ รอทีมตรวจ"
+- AI เพิ่ม Q-04 ถึง Q-08 ใน `specs/006-printing/spec.md` (Draft v3) และ CHANGELOG: ไม่หักโควตา, ผู้ใช้กรอกจำนวนหน้าเอง, ยังไม่ตรวจเพดานหน้า, ส่งเฉพาะข้อมูลไฟล์ (ไม่มี python-multipart และไม่มี spooler จริง), ยังไม่บันทึกรหัสผู้ใช้
+- T-03 สร้าง API อัปโหลดไฟล์ที่รองรับและคำนวณค่าใช้บริการ
+  - ไฟล์ที่แตะ: `backend/app/services/printing_service.py`, `backend/app/api/printing.py`, `backend/app/main.py`, `backend/tests/test_AC_PRT_01_cost_preview.py`
+  - ผล test: หลังบ้าน 12 passed, หน้าจอ 8 passed
+  - POST /api/print/upload รับ JSON (filename, content_type, size_bytes) แทน multipart ตาม Q-07 / GET /api/print/options คืน total_pages, estimated_cost, allowed_color_modes
