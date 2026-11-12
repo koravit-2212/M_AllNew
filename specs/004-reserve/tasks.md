@@ -81,7 +81,7 @@
 - แบบหน้าจอ: ไม่มี
 - ต้องทำหลัง: T-03
 - เสร็จเมื่อ: `test_AC_BKG_02_successful_reservation` ผ่าน (POST /api/reservations/check-availability ตอบว่าว่าง, POST /api/reservations บันทึกการจองและตอบสำเร็จ, GET /api/reservations/{id} อ่านการจองกลับมาได้)
-- สถานะ: พร้อมทำ (ทีมควรตอบข้อเสนอคำถาม ข้อ 1 ก่อนเริ่ม)
+- สถานะ: เสร็จ รอทีมตรวจ
 
 ### T-06 ทำขั้น "ยืนยัน" และหน้าผล "จองสำเร็จ"
 - รองรับ: FR-BKG-03, NFR-USB-01

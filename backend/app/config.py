@@ -71,3 +71,13 @@ SPACE_SLOT_TIMES = [
 
 # glossary "วันเดียวกัน" เทียบด้วยเขตเวลา Asia/Bangkok
 SPACE_BOOKING_TIMEZONE = 'Asia/Bangkok'
+
+# CON-ELG-01, Q-01: ประเภทผู้ใช้ที่มีสิทธิ์จองพื้นที่ (นักศึกษา บุคลากร ผู้ได้รับอนุญาต)
+SPACE_ELIGIBLE_USER_TYPES = ('student', 'staff', 'authorized')
+
+# CON-ELG-01, Q-01: ผู้ใช้ตัวอย่าง ชั่วคราวจนกว่าจะมีระบบยืนยันตัวตน (001/002) (ข้อมูลตัวอย่าง ทีมเลือกเอง)
+SPACE_USER_SEED_DATA = [
+    {'user_id': '64000001', 'name': 'นักศึกษาตัวอย่าง', 'user_type': 'student'},
+    {'user_id': 'ST-1001', 'name': 'บุคลากรตัวอย่าง', 'user_type': 'staff'},
+    {'user_id': 'GU-0001', 'name': 'บุคคลภายนอกตัวอย่าง', 'user_type': 'guest'},
+]

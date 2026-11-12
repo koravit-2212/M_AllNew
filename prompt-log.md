@@ -849,3 +849,8 @@
   - ไฟล์ที่แตะ: `frontend/src/api/client.js`, `frontend/src/pages/SpaceBookingPage.jsx`, `frontend/src/__tests__/SpaceBookingPage.test.jsx`
   - ผล test: หลังบ้าน 12 passed, หน้าจอ 9 passed
   - ข้อความตาม UI-BKG-01: ขั้นตอน "1 เลือกพื้นที่ / 2 ยืนยัน / 3 ผลการจอง", "พื้นที่ที่ใช้งานได้", "ว่างวันนี้" / "ไม่ว่างวันนี้", ป้าย "ว่าง" / "เต็ม", "ช่วงเวลา", รูปแบบ "09.00–11.00 น." พื้นที่และช่วงที่เต็มกดไม่ได้
+- AI เพิ่ม Q-01 ถึง Q-03 ใน `specs/004-reserve/spec.md` (Draft v3) และ CHANGELOG ตามคำสั่ง "ตัดสินใจเองทั้งหมดได้เลย": Q-01 ผู้ใช้ตัวอย่างและประเภทผู้มีสิทธิ์, Q-02 ASM-02 ยังไม่ทำ, Q-03 ASM-03/04 ยังไม่ทำ
+- T-05 สร้าง API ตรวจความว่างและบันทึกการจองแบบ atomic พร้อมตรวจสิทธิ์ผู้จอง
+  - ไฟล์ที่แตะ: `backend/app/config.py`, `backend/app/services/reservation_service.py`, `backend/app/api/reservations.py`, `backend/app/main.py`, `backend/tests/test_AC_BKG_02_successful_reservation.py`
+  - ผล test: หลังบ้าน 15 passed, หน้าจอ 9 passed
+  - เพิ่ม GET /api/space-users (Q-01 ชั่วคราว) ผู้ไม่มีสิทธิ์ตอบ 403 "ไม่มีสิทธิ์จองพื้นที่" ตรวจความว่างและบันทึกภายใต้ lock เดียวกัน (CON-CONC-01)
