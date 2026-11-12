@@ -14,7 +14,7 @@ from app.services.equipment_service import (
     list_pending_requests,
 )
 
-# FR-EQP-01, FR-EQP-02, FR-EQP-03, FR-EQP-04, FR-EQP-05, ASM-01
+# FR-EQP-01, FR-EQP-02, FR-EQP-03, FR-EQP-04, FR-EQP-05, FR-EQP-06, ASM-01
 # Route ของบริการยืมอุปกรณ์ เก็บข้อมูลในหน่วยความจำแบบเดียวกับ 003 (ทีมเลือกเอง ไม่ได้มาจาก spec)
 
 router = APIRouter(prefix='/api')
@@ -97,7 +97,7 @@ def list_pending_requests_endpoint(store: EquipmentStore = Depends(get_equipment
 
 @router.get('/loan-requests/{request_id}')
 def get_loan_request_endpoint(request_id: str, store: EquipmentStore = Depends(get_equipment_store)) -> dict:
-    """FR-EQP-03, CON-LNS-02: รายละเอียดคำขอพร้อมรายการค้างคืนของนักศึกษา"""
+    """FR-EQP-03, FR-EQP-06, CON-LNS-02: รายละเอียดคำขอพร้อมรายการค้างคืนของนักศึกษา ให้เจ้าหน้าที่ตรวจก่อนตัดสินใจ"""
 
     try:
         return get_request_detail(store, request_id)

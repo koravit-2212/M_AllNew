@@ -57,7 +57,10 @@ def list_pending_requests(store: EquipmentStore) -> list[LoanRequest]:
 
 
 def get_request_detail(store: EquipmentStore, request_id: str) -> dict:
-    """FR-EQP-03, CON-LNS-02: ข้อมูลที่เจ้าหน้าที่ใช้ตรวจก่อนอนุมัติ คือนักศึกษา อุปกรณ์ และรายการค้างคืน"""
+    """FR-EQP-03, FR-EQP-06, CON-LNS-02: ข้อมูลที่เจ้าหน้าที่ใช้ตรวจก่อนอนุมัติ คือนักศึกษา อุปกรณ์ และรายการค้างคืน
+    คำขอของนักศึกษาที่มีรายการค้างคืนยังเป็น pending ไม่อนุมัติเอง ให้เจ้าหน้าที่ตรวจก่อนตัดสินใจ (FR-EQP-06)
+    การบล็อกและ override ตาม ASM-02 ยังไม่ทำ รอ T-14
+    """
 
     request = store.requests.get(request_id)
     if request is None:
@@ -69,6 +72,7 @@ def get_request_detail(store: EquipmentStore, request_id: str) -> dict:
         'status': request.status,
         'quantity': request.quantity,
         'student': {'student_id': student.student_id, 'name': student.name},
+        'has_outstanding': student.has_outstanding,
         'outstanding_items': [dict(item) for item in student.outstanding_items],
         'equipment': {
             'equipment_type_id': equipment.equipment_type_id,
