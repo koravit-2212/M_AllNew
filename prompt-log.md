@@ -875,3 +875,10 @@
   - ไฟล์ที่แตะ: `frontend/src/pages/PrintPage.jsx`, `frontend/src/__tests__/PrintPage.test.jsx`
   - ผล test: หลังบ้าน 18 passed, หน้าจอ 13 passed
   - ข้อความตาม UI-PRT-01: "ไม่รองรับไฟล์ชนิดนี้" และ "รองรับ .pdf, .docx, ... ขนาดไม่เกิน 50 MB" (รายการและขนาดมาจากหลังบ้าน ไม่ฝังในหน้า) ปุ่ม "ถัดไป" กดไม่ได้
+
+## 2026-11-12 /testcases AC-PRT-01 ถึง AC-PRT-04 specs/006-printing (ร่าง + เขียน test ในรอบเดียว)
+
+- สร้าง `specs/006-printing/test-cases.md` 16 แถว: TC-PRT-01-1..4, 02-1..4 (02-4 = คน, ร่าง เพราะ spooler จำลอง), 03-1..3, 04-1..4, TC-PRT-NFR-1 (คน, ร่าง)
+- AI เปลี่ยนแถวเป็น "ใช้ได้" เองตามคำสั่ง "ตัดสินใจเองทั้งหมดได้เลย" ทีมควรตรวจอีกครั้ง
+- เขียน test: หลังบ้าน `test_AC_PRT_01.py` ถึง `test_AC_PRT_04.py` 14 test (ตัวช่วยร่วม `_prt_helpers.py` ไม่ใช้ conftest.py เพื่อไม่ชนกับ branch 007 ตอน merge), หน้าจอ `TC-PRT-01-1`, `01-2`, `02-1`, `03-1`, `04-1`, `04-4` .test.jsx 6 ไฟล์
+- ผล: หลังบ้าน 32 passed, หน้าจอ 19 passed ไม่มี test ไม่ผ่าน
