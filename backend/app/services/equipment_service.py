@@ -23,17 +23,21 @@ class RequestNotPending(Exception):
 
 
 class InsufficientStock(Exception):
-    """จำนวนคงเหลือไม่พอตอนอนุมัติ (FR-EQP-02)"""
+    """จำนวนคงเหลือไม่พอ ตอนส่งคำขอหรือตอนอนุมัติ (FR-EQP-02, FR-EQP-05)"""
 
 
 def create_loan_request(store: EquipmentStore, student_id: str, equipment_type_id: str, quantity: int) -> LoanRequest:
-    """FR-EQP-02, ASM-01: สร้างคำขอยืมสถานะรออนุมัติ ยังไม่ลดจำนวนคงเหลือ เพราะต้องผ่านเจ้าหน้าที่เสมอ"""
+    """FR-EQP-02, ASM-01: สร้างคำขอยืมสถานะรออนุมัติ ยังไม่ลดจำนวนคงเหลือ เพราะต้องผ่านเจ้าหน้าที่เสมอ
+    FR-EQP-05: ถ้าจำนวนคงเหลือไม่พอ ปฏิเสธทันที ไม่สร้างคำขอ
+    """
 
     with store.lock:
         if equipment_type_id not in store.equipment_types:
             raise EquipmentNotFound(equipment_type_id)
         if student_id not in store.students:
             raise StudentNotFound(student_id)
+        if store.equipment_types[equipment_type_id].available_count < quantity:
+            raise InsufficientStock(equipment_type_id)
 
         request_id = f'REQ-{len(store.requests) + 1:04d}'
         request = LoanRequest(

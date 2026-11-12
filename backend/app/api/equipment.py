@@ -14,7 +14,7 @@ from app.services.equipment_service import (
     list_pending_requests,
 )
 
-# FR-EQP-01, FR-EQP-02, FR-EQP-03, FR-EQP-04, ASM-01
+# FR-EQP-01, FR-EQP-02, FR-EQP-03, FR-EQP-04, FR-EQP-05, ASM-01
 # Route ของบริการยืมอุปกรณ์ เก็บข้อมูลในหน่วยความจำแบบเดียวกับ 003 (ทีมเลือกเอง ไม่ได้มาจาก spec)
 
 router = APIRouter(prefix='/api')
@@ -73,10 +73,14 @@ def _request_payload(request: LoanRequest) -> dict:
 
 @router.post('/loan-requests', status_code=201)
 def create_loan_request_endpoint(body: LoanRequestIn, store: EquipmentStore = Depends(get_equipment_store)) -> dict:
-    """FR-EQP-02, ASM-01: นักศึกษาส่งคำขอยืม ได้คำขอสถานะ pending รอเจ้าหน้าที่"""
+    """FR-EQP-02, ASM-01: นักศึกษาส่งคำขอยืม ได้คำขอสถานะ pending รอเจ้าหน้าที่
+    FR-EQP-05: อุปกรณ์หมดหรือไม่พอ ตอบ 409 "ไม่สามารถยืมได้"
+    """
 
     try:
         request = create_loan_request(store, body.student_id, body.equipment_type_id, body.quantity)
+    except InsufficientStock:
+        raise HTTPException(status_code=409, detail='ไม่สามารถยืมได้')
     except EquipmentNotFound:
         raise HTTPException(status_code=404, detail='Equipment type not found')
     except StudentNotFound:
