@@ -870,3 +870,12 @@
 - ผล test: หลังบ้าน 15 passed, หน้าจอ 9 passed
 - เพิ่ม GET /api/students ใน `api/equipment.py` สำหรับให้หน้านักศึกษาเลือกนักศึกษาตัวอย่าง ตามคำตอบทีมข้อ 3 (ชั่วคราว)
 - กรณีอุปกรณ์ไม่พอยังไม่ปฏิเสธ อยู่ใน T-09 (เฟส 3)
+
+## 2026-11-12 คำสั่ง: /implement-all 007-equipment เฟส 2 — T-06
+
+- task: T-06 สร้าง API ให้เจ้าหน้าที่ดูคำขอและอนุมัติ แล้วบันทึกการยืมและลดจำนวนคงเหลือ
+- ไฟล์ที่แตะ: `backend/app/services/equipment_service.py`, `backend/app/api/equipment.py`, `backend/tests/test_AC_EQP_02_approve_and_record.py` (และ `tasks.md`, `prompt-log.md`)
+- ผล test: หลังบ้าน 17 passed, หน้าจอ 9 passed
+- เพิ่ม GET /api/loan-requests (รายการรออนุมัติ) ตามหน้าจอ "Pending requests list" ใน plan.md ข้อ 4 เพราะ UI-EQP-02 ไม่ได้บอกว่าเจ้าหน้าที่เลือกคำขอจากไหน
+- approver_id ไม่บังคับ (ค่าว่าง) เพราะยังไม่มีล็อกอิน ตามคำตอบทีมข้อ 3
+- ตอนอนุมัติตรวจจำนวนซ้ำภายใต้ lock ถ้าไม่พอคืน 409 "ไม่สามารถยืมได้" กันคงเหลือติดลบ ยังไม่กำหนด due date (T-13)

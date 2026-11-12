@@ -2,9 +2,19 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
 
 from app.models.equipment import EquipmentStore, LoanRequest, build_seed_equipment_store
-from app.services.equipment_service import EquipmentNotFound, StudentNotFound, create_loan_request
+from app.services.equipment_service import (
+    EquipmentNotFound,
+    InsufficientStock,
+    RequestNotFound,
+    RequestNotPending,
+    StudentNotFound,
+    approve_request,
+    create_loan_request,
+    get_request_detail,
+    list_pending_requests,
+)
 
-# FR-EQP-01, FR-EQP-02, FR-EQP-03, ASM-01
+# FR-EQP-01, FR-EQP-02, FR-EQP-03, FR-EQP-04, ASM-01
 # Route ของบริการยืมอุปกรณ์ เก็บข้อมูลในหน่วยความจำแบบเดียวกับ 003 (ทีมเลือกเอง ไม่ได้มาจาก spec)
 
 router = APIRouter(prefix='/api')
@@ -72,3 +82,55 @@ def create_loan_request_endpoint(body: LoanRequestIn, store: EquipmentStore = De
     except StudentNotFound:
         raise HTTPException(status_code=404, detail='Student not found')
     return _request_payload(request)
+
+
+@router.get('/loan-requests')
+def list_pending_requests_endpoint(store: EquipmentStore = Depends(get_equipment_store)) -> dict:
+    """FR-EQP-03: รายการคำขอที่รอเจ้าหน้าที่ตรวจสอบ"""
+
+    return {'items': [get_request_detail(store, request.request_id) for request in list_pending_requests(store)]}
+
+
+@router.get('/loan-requests/{request_id}')
+def get_loan_request_endpoint(request_id: str, store: EquipmentStore = Depends(get_equipment_store)) -> dict:
+    """FR-EQP-03, CON-LNS-02: รายละเอียดคำขอพร้อมรายการค้างคืนของนักศึกษา"""
+
+    try:
+        return get_request_detail(store, request_id)
+    except RequestNotFound:
+        raise HTTPException(status_code=404, detail='Loan request not found')
+
+
+class ApproveIn(BaseModel):
+    # ยังไม่มีระบบล็อกอิน (001/002) จึงไม่บังคับรหัสเจ้าหน้าที่ ตามคำตอบทีมข้อ 3 (ชั่วคราว)
+    approver_id: str = ''
+
+
+@router.post('/loan-requests/{request_id}/approve')
+def approve_loan_request_endpoint(
+    request_id: str,
+    body: ApproveIn | None = None,
+    store: EquipmentStore = Depends(get_equipment_store),
+) -> dict:
+    """FR-EQP-03, FR-EQP-04: เจ้าหน้าที่อนุมัติ บันทึกการยืม และคืนจำนวนคงเหลือใหม่"""
+
+    approver_id = body.approver_id if body else ''
+    try:
+        loan = approve_request(store, request_id, approver_id)
+    except RequestNotFound:
+        raise HTTPException(status_code=404, detail='Loan request not found')
+    except RequestNotPending:
+        raise HTTPException(status_code=409, detail='Loan request is not pending')
+    except InsufficientStock:
+        raise HTTPException(status_code=409, detail='ไม่สามารถยืมได้')
+
+    equipment = store.equipment_types[loan.equipment_type_id]
+    return {
+        'loan_id': loan.loan_id,
+        'request_id': loan.request_id,
+        'student_id': loan.student_id,
+        'equipment_type_id': loan.equipment_type_id,
+        'equipment_name': equipment.name,
+        'quantity': loan.quantity,
+        'available_count': equipment.available_count,
+    }
