@@ -1111,4 +1111,76 @@
 - ตารางไปข้างหน้า 8 แถว: ครบ 5 (FR-BKG-03, FR-BKG-04, NFR-REL-03, CON-ELG-01, CON-CONC-01), ช่องโหว่ 3 (FR-BKG-01 F-05, FR-BKG-02 F-03, NFR-USB-01 F-01)
 - ข้อค้นพบ 6 ข้อ แก้ด้วยเอกสารทันที 3 ข้อ (F-02 → Q-06, F-04 → Q-05, F-06 → plan ข้อ 4 + ตาราง "ค่าที่ตั้งได้") ยังเปิด 3 ข้อ (F-05 Q-08, F-03 Q-07, F-01 TC-BKG-NFR-1)
 - Q-07, Q-08 AI ไม่ตอบเอง เพราะตอบแล้วต้องแก้ test จาก test-cases.md ที่ใช้วันที่ตายตัว และเป็นการตัดสินกฎการจองที่กระทบผู้ใช้ ให้ทีมตอบ
+## 2026-11-12 คำสั่ง: /tasks specs/006-printing/spec.md (ทีมสั่ง "ทำทั้ง 3 ส่วนเลย")
+
+- เครื่องมือ: Claude Code, branch `006-printing`
+- คำสั่งเสริม: ใน task หน้าจอใส่ `frontend/src/App.jsx` ในช่องไฟล์ที่แตะ และใส่ `backend/app/main.py` ใน task ที่ลงทะเบียน router
+- ผลลัพธ์: สร้าง `specs/006-printing/tasks.md` 5 เฟส 10 task ไม่มี task รอ Q-xx
+- ข้อเสนอคำถามให้ทีม: (1) การหักโควตา SU-IT ตาม ASM-04 ไม่มี FR และขัดกับ Out of scope เรื่องการชำระเงิน (2) จำนวนหน้าให้ผู้ใช้กรอกเอง (3) เพดานหน้าต่อเทอมใน ASM-03 ไม่มี FR
+- ทางเทคนิค: ใช้ข้อมูลในหน่วยความจำและ spooler จำลอง (ทีมเลือกเอง ไม่ได้มาจาก spec) และ spec ไม่มีหมวด "หน้าจอ (UI)"
+
+## 2026-11-12 คำสั่ง: /implement-all specs/006-printing/tasks.md เฟส 0 — T-01
+
+- task: T-01 กำหนดค่าการพิมพ์ใน config และสร้างที่เก็บงานพิมพ์กับ spooler จำลอง
+- ไฟล์ที่แตะ: `backend/app/config.py`, `backend/app/models/printing.py`, `backend/tests/test_PRT_T01_print_store.py`
+- ผล test: หลังบ้าน 10 passed, หน้าจอ 7 passed
+
+## 2026-11-12 คำสั่ง: /implement-all specs/006-printing/tasks.md เฟส 0 — T-02
+
+- task: T-02 เพิ่มเมนูไปหน้าปริ้นเอกสารใน App.jsx โดยไม่ลบหน้าเดิม
+- ไฟล์ที่แตะ: `frontend/src/App.jsx`, `frontend/src/pages/PrintPage.jsx`, `frontend/src/__tests__/App.test.jsx`
+- ผล test: หลังบ้าน 10 passed, หน้าจอ 8 passed
+- เมนูหน้าเดิมชื่อ "หนังสือ" (ไม่ใช้ "ค้นหาหนังสือ" เพราะ test เดิม `setup.test.jsx` หาข้อความนี้แบบมีได้ตัวเดียว) และจัดเป็นอาร์เรย์ MENUS แบบเดียวกับ branch 004 และ 007 เพื่อให้รวมกันง่าย
+
+## 2026-11-12 คำสั่ง: "ทำ 004 006 ต่อเลยจนจบ" → /implement-all 006-printing
+
+- ทำต่อทุกเฟสโดยไม่หยุดที่จุดตรวจ (ทีมสั่ง "ตัดสินใจเองทั้งหมดได้เลย") task คงสถานะ "เสร็จ รอทีมตรวจ"
+- AI เพิ่ม Q-04 ถึง Q-08 ใน `specs/006-printing/spec.md` (Draft v3) และ CHANGELOG: ไม่หักโควตา, ผู้ใช้กรอกจำนวนหน้าเอง, ยังไม่ตรวจเพดานหน้า, ส่งเฉพาะข้อมูลไฟล์ (ไม่มี python-multipart และไม่มี spooler จริง), ยังไม่บันทึกรหัสผู้ใช้
+- T-03 สร้าง API อัปโหลดไฟล์ที่รองรับและคำนวณค่าใช้บริการ
+  - ไฟล์ที่แตะ: `backend/app/services/printing_service.py`, `backend/app/api/printing.py`, `backend/app/main.py`, `backend/tests/test_AC_PRT_01_cost_preview.py`
+  - ผล test: หลังบ้าน 12 passed, หน้าจอ 8 passed
+  - POST /api/print/upload รับ JSON (filename, content_type, size_bytes) แทน multipart ตาม Q-07 / GET /api/print/options คืน total_pages, estimated_cost, allowed_color_modes
+- T-04 ทำหน้าเลือกไฟล์ ชนิดการพิมพ์ จำนวนหน้า จำนวนชุด และแสดงค่าใช้บริการ
+  - ไฟล์ที่แตะ: `frontend/src/api/client.js`, `frontend/src/pages/PrintPage.jsx`, `frontend/src/__tests__/PrintPage.test.jsx`
+  - ผล test: หลังบ้าน 12 passed, หน้าจอ 9 passed
+  - ข้อความตาม UI-PRT-01: ขั้น "1 เลือกไฟล์ / 2 ยืนยัน / 3 ผล", "ไฟล์", "<ชื่อ> (1.2 MB)", "ชนิดการพิมพ์" ขาว-ดำ / สี, "จำนวนหน้า", "จำนวนชุด", "คำนวณ: 12 หน้า × 2 ชุด = 24 หน้า", "ค่าใช้บริการ: 24 บาท"
+  - ไม่ใส่ข้อความ "หักจากโควตาฟรี 100 บาท/เทอม" ใน mockup ตาม Q-04
+- T-05 สร้าง API ยืนยันการพิมพ์ ส่งงานไป spooler และบันทึกการใช้บริการ
+  - ไฟล์ที่แตะ: `backend/app/services/printing_service.py`, `backend/app/api/printing.py`, `backend/tests/test_AC_PRT_02_print_flow.py`
+  - ผล test: หลังบ้าน 14 passed
+  - POST /api/print/submit ได้ status "sent" spooler จำลองได้รับงานพร้อมจำนวนหน้า × ชุด GET /api/print/jobs/{id} อ่านกลับได้ ไม่ตรวจโควตา (Q-04) ยังไม่ตรวจเครื่องไม่พร้อม (T-07)
+- AI เพิ่ม Q-09 (ข้อความเมื่อส่งงานไม่สำเร็จด้วยเหตุอื่น "ส่งงานพิมพ์ไม่สำเร็จ กรุณาลองใหม่") ใน spec 006
+- T-06 ทำขั้น "ยืนยัน" และหน้าผล "ส่งงานพิมพ์แล้ว"
+  - ไฟล์ที่แตะ: `frontend/src/api/client.js`, `frontend/src/pages/PrintPage.jsx`, `frontend/src/__tests__/PrintPage.test.jsx`
+  - ผล test: หลังบ้าน 14 passed, หน้าจอ 11 passed
+  - ข้อความตาม UI-PRT-01: "ถัดไป", "ส่งงานพิมพ์แล้ว", "บันทึกข้อมูลการใช้บริการแล้ว", การ์ด ไฟล์ / จำนวน / ค่าใช้บริการ ขั้นยืนยันใช้การ์ดเดียวกัน + "ยืนยันการพิมพ์" และ "กลับ"
+- T-07 ไม่ส่งงานเมื่อเครื่องพิมพ์ไม่พร้อม และเปิด API สถานะเครื่องพิมพ์
+  - ไฟล์ที่แตะ: `backend/app/services/printing_service.py`, `backend/app/api/printing.py`, `backend/tests/test_AC_PRT_03_printer_not_ready.py`
+  - ผล test: หลังบ้าน 16 passed
+  - submit ตอบ 409 "เครื่องพิมพ์ไม่พร้อมใช้งาน" ไม่ส่ง spooler ไม่บันทึกงาน เพิ่ม GET /api/printers/status (มีใน plan ข้อ 4)
+- T-08 แสดงสถานะ "เครื่องพิมพ์ไม่พร้อมใช้งาน" และปุ่มลองใหม่
+  - ไฟล์ที่แตะ: `frontend/src/pages/PrintPage.jsx`, `frontend/src/__tests__/PrintPage.test.jsx`
+  - ผล test: หลังบ้าน 16 passed, หน้าจอ 12 passed
+  - ข้อความตาม UI-PRT-01: "เครื่องพิมพ์ไม่พร้อมใช้งาน", "ยังไม่ได้ส่งงานพิมพ์ กรุณาลองใหม่หรือติดต่อเจ้าหน้าที่", ปุ่ม "ลองใหม่" (ส่งงานเดิมอีกครั้ง)
+- T-09 ปฏิเสธไฟล์ที่ชนิดหรือขนาดไม่ตรง CON-FILE-01
+  - ไฟล์ที่แตะ: `backend/app/services/printing_service.py`, `backend/app/api/printing.py`, `backend/tests/test_AC_PRT_04_unsupported_file.py`
+  - ผล test: หลังบ้าน 18 passed
+  - upload ตอบ 415 พร้อม detail {message: "ไม่รองรับไฟล์ชนิดนี้", allowed_extensions, max_size_mb} จาก config ไม่บันทึกไฟล์ ไม่ได้ file_id นามสกุลไม่สนตัวพิมพ์เล็กใหญ่ ขนาด 50 MB พอดีรับได้
+- T-10 แสดงคำเตือนไฟล์ไม่รองรับและปิดปุ่มถัดไป
+  - ไฟล์ที่แตะ: `frontend/src/pages/PrintPage.jsx`, `frontend/src/__tests__/PrintPage.test.jsx`
+  - ผล test: หลังบ้าน 18 passed, หน้าจอ 13 passed
+  - ข้อความตาม UI-PRT-01: "ไม่รองรับไฟล์ชนิดนี้" และ "รองรับ .pdf, .docx, ... ขนาดไม่เกิน 50 MB" (รายการและขนาดมาจากหลังบ้าน ไม่ฝังในหน้า) ปุ่ม "ถัดไป" กดไม่ได้
+
+## 2026-11-12 /testcases AC-PRT-01 ถึง AC-PRT-04 specs/006-printing (ร่าง + เขียน test ในรอบเดียว)
+
+- สร้าง `specs/006-printing/test-cases.md` 16 แถว: TC-PRT-01-1..4, 02-1..4 (02-4 = คน, ร่าง เพราะ spooler จำลอง), 03-1..3, 04-1..4, TC-PRT-NFR-1 (คน, ร่าง)
+- AI เปลี่ยนแถวเป็น "ใช้ได้" เองตามคำสั่ง "ตัดสินใจเองทั้งหมดได้เลย" ทีมควรตรวจอีกครั้ง
+- เขียน test: หลังบ้าน `test_AC_PRT_01.py` ถึง `test_AC_PRT_04.py` 14 test (ตัวช่วยร่วม `_prt_helpers.py` ไม่ใช้ conftest.py เพื่อไม่ชนกับ branch 007 ตอน merge), หน้าจอ `TC-PRT-01-1`, `01-2`, `02-1`, `03-1`, `04-1`, `04-4` .test.jsx 6 ไฟล์
+- ผล: หลังบ้าน 32 passed, หน้าจอ 19 passed ไม่มี test ไม่ผ่าน
+
+## 2026-11-12 /verify specs/006-printing
+
+- สร้าง `specs/006-printing/rtm.md` ผล test 51 ผ่าน 0 ไม่ผ่าน (pytest 32, vitest 19)
+- ตารางไปข้างหน้า 8 แถว: ครบ 3 (FR-PRT-01, 02, 05), ช่องโหว่ 5 (FR-PRT-03 / IF-PRN-01 จาก F-02, FR-PRT-04 / CON-FILE-01 จาก F-06, NFR-USB-01 จาก F-01)
+- ข้อค้นพบ 7 ข้อ แก้ด้วยเอกสารทันที 4 ข้อ (F-03, F-04, F-05 แก้ plan ข้อ 4 + ตาราง "ค่าที่ตั้งได้", F-07 แก้ข้อความจุดตรวจเฟส 3 ใน tasks.md) ยังเปิด 3 ข้อ (F-02, F-06 ผูกกับ Q-07 spooler / เนื้อไฟล์จริง, F-01 มือถือ)
 - ช่อง "ทีมตัดสิน" AI เขียนแทนตามคำสั่ง "ตัดสินใจเองทั้งหมดได้เลย"

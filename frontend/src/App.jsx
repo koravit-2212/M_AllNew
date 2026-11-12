@@ -2,18 +2,21 @@ import { useState } from 'react'
 
 import BookDetailPage from './pages/BookDetailPage.jsx'
 import EquipmentLoanPage from './pages/EquipmentLoanPage.jsx'
+import PrintPage from './pages/PrintPage.jsx'
 import SearchPage from './pages/SearchPage.jsx'
 import SpaceBookingPage from './pages/SpaceBookingPage.jsx'
 import StaffLoanApprovalPage from './pages/StaffLoanApprovalPage.jsx'
 
 // FR-SRC-02, FR-SRC-03, AC-SRC-04: สลับระหว่าง Search Page และ Book Detail Page ตามการเลือกหนังสือ
 // FR-BKG-01, NFR-USB-01: เมนูไปหน้าจองพื้นที่ (004-reserve) โดยไม่ลบหน้าเดิม
+// FR-PRT-01, NFR-USB-01: เมนูไปหน้าปริ้นเอกสาร (006-printing) โดยไม่ลบหน้าเดิม
 // FR-EQP-01, NFR-USB-01: เมนูไปหน้ายืมอุปกรณ์ (007-equipment) โดยไม่ลบหน้าเดิม
 // FR-EQP-03, FR-EQP-04: เมนูเจ้าหน้าที่อนุมัติการยืมอุปกรณ์ ยังไม่ตรวจสิทธิ์จนกว่าจะมี 001/002 (Q-05 ของ 007)
 // แต่ละฟีเจอร์เพิ่มเมนูของตัวเอง 1 แถวใน MENUS และ 1 กรณีใน renderPage
 const MENUS = [
   { key: 'books', label: 'หนังสือ' },
   { key: 'space-booking', label: 'จองพื้นที่' },
+  { key: 'printing', label: 'ปริ้นเอกสาร' },
   { key: 'equipment', label: 'ยืมอุปกรณ์' },
   { key: 'equipment-staff', label: 'อนุมัติยืมอุปกรณ์ (เจ้าหน้าที่)' },
 ]
@@ -32,6 +35,8 @@ function renderPage(menuKey) {
   switch (menuKey) {
     case 'space-booking':
       return <SpaceBookingPage />
+    case 'printing':
+      return <PrintPage />
     case 'equipment':
       return <EquipmentLoanPage />
     case 'equipment-staff':

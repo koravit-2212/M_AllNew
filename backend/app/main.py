@@ -4,6 +4,7 @@ from app.api.books import router as books_router
 from app.api.equipment import router as equipment_router
 from app.api.health import router as health_router
 from app.api.reservations import router as reservations_router
+from app.api.printing import router as printing_router
 from app.api.search import router as search_router
 from app.api.spaces import router as spaces_router
 
@@ -20,6 +21,8 @@ app.include_router(equipment_router)
 app.include_router(spaces_router)
 # FR-BKG-02, FR-BKG-03, FR-BKG-04 route ตรวจความว่างและบันทึกการจอง
 app.include_router(reservations_router)
+# FR-PRT-01 ถึง FR-PRT-05 route ของบริการปริ้นเอกสาร (006-printing)
+app.include_router(printing_router)
 
 
 @app.get('/health')
