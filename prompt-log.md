@@ -854,3 +854,9 @@
   - ไฟล์ที่แตะ: `backend/app/config.py`, `backend/app/services/reservation_service.py`, `backend/app/api/reservations.py`, `backend/app/main.py`, `backend/tests/test_AC_BKG_02_successful_reservation.py`
   - ผล test: หลังบ้าน 15 passed, หน้าจอ 9 passed
   - เพิ่ม GET /api/space-users (Q-01 ชั่วคราว) ผู้ไม่มีสิทธิ์ตอบ 403 "ไม่มีสิทธิ์จองพื้นที่" ตรวจความว่างและบันทึกภายใต้ lock เดียวกัน (CON-CONC-01)
+- AI เพิ่ม Q-04 (ข้อความเมื่อจองไม่สำเร็จด้วยเหตุอื่น "จองไม่สำเร็จ กรุณาลองใหม่") ใน spec 004
+- T-06 ทำขั้น "ยืนยัน" และหน้าผล "จองสำเร็จ"
+  - ไฟล์ที่แตะ: `frontend/src/api/client.js`, `frontend/src/pages/SpaceBookingPage.jsx`, `frontend/src/__tests__/SpaceBookingPage.test.jsx`
+  - ผล test: หลังบ้าน 15 passed, หน้าจอ 12 passed
+  - ข้อความตาม UI-BKG-01: "ถัดไป", "จองสำเร็จ", "บันทึกการจองแล้ว", การ์ด พื้นที่ / วันที่ / เวลา, "กลับหน้าหลัก" ขั้นยืนยันไม่มีใน mockup ใช้การ์ดเดียวกัน + ปุ่ม "ยืนยันการจอง" และ "กลับ"
+  - เพิ่มช่องเลือก "ผู้จอง" (Q-01 ชั่วคราว) 403 แสดง "ไม่มีสิทธิ์จองพื้นที่" เหตุอื่นแสดงตาม Q-04

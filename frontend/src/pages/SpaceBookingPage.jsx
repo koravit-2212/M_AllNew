@@ -2,9 +2,9 @@ import { useEffect, useState } from 'react'
 
 import { api } from '../api/client.js'
 
-// FR-BKG-01, NFR-USB-01
-// หน้าจองพื้นที่ในห้องสมุด (UI-BKG-01) ขั้น 1 เลือกพื้นที่และช่วงเวลา
-// ขั้นยืนยันและผลการจองเพิ่มใน T-06 สถานะพื้นที่ไม่ว่างเพิ่มใน T-08
+// FR-BKG-01, FR-BKG-03, NFR-USB-01
+// หน้าจองพื้นที่ในห้องสมุด (UI-BKG-01) ขั้น 1 เลือกพื้นที่และช่วงเวลา ขั้น 2 ยืนยัน ขั้น 3 ผลการจอง
+// สถานะพื้นที่ไม่ว่างเพิ่มใน T-08
 
 const STEPS = ['1 เลือกพื้นที่', '2 ยืนยัน', '3 ผลการจอง']
 
@@ -32,6 +32,39 @@ function Steps({ current }) {
   )
 }
 
+// FR-BKG-03: วันที่แบบไทย เช่น "ศ. 13 พ.ย. 2569"
+function formatThaiDate(isoDate) {
+  if (!isoDate) return ''
+  const [year, month, day] = isoDate.split('-').map(Number)
+  return new Date(year, month - 1, day).toLocaleDateString('th-TH', {
+    weekday: 'short',
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  })
+}
+
+function SummaryCard({ space, slot, withDate = true }) {
+  return (
+    <div className="mt-3 rounded-xl border border-slate-200 px-4 py-3 text-sm" aria-label="รายละเอียดการจอง">
+      <div className="flex justify-between gap-3 py-1">
+        <span className="text-slate-500">พื้นที่</span>
+        <span className="text-right">{space.facility_name}</span>
+      </div>
+      {withDate && (
+        <div className="flex justify-between gap-3 py-1">
+          <span className="text-slate-500">วันที่</span>
+          <span className="text-right">{formatThaiDate(slot.date)}</span>
+        </div>
+      )}
+      <div className="flex justify-between gap-3 py-1">
+        <span className="text-slate-500">เวลา</span>
+        <span className="text-right">{formatSlotTime(slot)}</span>
+      </div>
+    </div>
+  )
+}
+
 function StatusBadge({ available }) {
   return available ? (
     <span className="rounded-full bg-emerald-100 px-3 py-0.5 text-xs text-emerald-700">ว่าง</span>
@@ -44,8 +77,17 @@ export default function SpaceBookingPage({ client = api }) {
   const [spaces, setSpaces] = useState([])
   const [spaceId, setSpaceId] = useState(null)
   const [slotId, setSlotId] = useState(null)
+  const [users, setUsers] = useState([])
+  const [userId, setUserId] = useState('')
+  // step: 'select' | 'confirm' | 'done'
+  const [step, setStep] = useState('select')
+  const [booked, setBooked] = useState(null)
+  // null | 'not_eligible' (403, CON-ELG-01) | 'failed' (Q-04)
+  const [error, setError] = useState(null)
+  const [submitting, setSubmitting] = useState(false)
+  const [reloadKey, setReloadKey] = useState(0)
 
-  // FR-BKG-01: โหลดพื้นที่ที่ใช้งานได้พร้อมช่วงเวลา
+  // FR-BKG-01: โหลดพื้นที่ที่ใช้งานได้พร้อมช่วงเวลา และผู้ใช้ตัวอย่าง (Q-01)
   useEffect(() => {
     let active = true
     const load = async () => {
@@ -55,20 +97,137 @@ export default function SpaceBookingPage({ client = api }) {
       } catch {
         if (active) setSpaces([])
       }
+      try {
+        const payload = await client.listSpaceUsers?.()
+        if (active) {
+          const list = payload?.items ?? []
+          setUsers(list)
+          setUserId((current) => current || list[0]?.userId || '')
+        }
+      } catch {
+        if (active) setUsers([])
+      }
     }
     load()
     return () => {
       active = false
     }
-  }, [client])
+  }, [client, reloadKey])
 
   const selectedSpace = spaces.find((space) => space.space_id === spaceId)
+  const selectedSlot = selectedSpace?.slots.find((slot) => slot.slot_id === slotId)
+
+  // กลับไปขั้นเลือก และโหลดสถานะว่างใหม่
+  const backToSelect = () => {
+    setStep('select')
+    setSlotId(null)
+    setError(null)
+    setBooked(null)
+    setReloadKey((key) => key + 1)
+  }
+
+  // FR-BKG-02, FR-BKG-03: ยืนยันการจอง หลังบ้านตรวจความว่างและบันทึกแบบ atomic
+  const confirm = async () => {
+    if (!selectedSpace || !selectedSlot || !userId) return
+    setSubmitting(true)
+    setError(null)
+    try {
+      await client.createReservation({
+        userId,
+        spaceId: selectedSpace.space_id,
+        date: selectedSlot.date,
+        startTime: selectedSlot.start_time,
+        endTime: selectedSlot.end_time,
+      })
+      setBooked({ space: selectedSpace, slot: selectedSlot })
+      setStep('done')
+    } catch (err) {
+      setError(err?.status === 403 ? 'not_eligible' : 'failed')
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  if (step === 'done' && booked) {
+    return (
+      <main className="mx-auto max-w-4xl p-4 md:p-8">
+        <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm md:p-8">
+          <h1 className="text-2xl font-bold text-slate-800">จองพื้นที่ในห้องสมุด</h1>
+          <Steps current={2} />
+          <div className="mt-4 rounded-2xl border border-emerald-200 bg-emerald-50 p-6 text-center text-emerald-900" role="status">
+            <b className="block text-xl">จองสำเร็จ</b>
+            <small className="mt-1 block text-sm">บันทึกการจองแล้ว</small>
+          </div>
+          <SummaryCard space={booked.space} slot={booked.slot} />
+          <button
+            type="button"
+            onClick={backToSelect}
+            className="mt-4 w-full rounded-xl border border-teal-700 bg-white px-4 py-3 font-bold text-teal-700"
+          >
+            กลับหน้าหลัก
+          </button>
+        </section>
+      </main>
+    )
+  }
+
+  if (step === 'confirm' && selectedSpace && selectedSlot) {
+    return (
+      <main className="mx-auto max-w-4xl p-4 md:p-8">
+        <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm md:p-8">
+          <h1 className="text-2xl font-bold text-slate-800">จองพื้นที่ในห้องสมุด</h1>
+          <Steps current={1} />
+          {error && (
+            <div className="mt-4 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800" role="alert">
+              <b className="block text-base">{error === 'not_eligible' ? 'ไม่มีสิทธิ์จองพื้นที่' : 'จองไม่สำเร็จ กรุณาลองใหม่'}</b>
+            </div>
+          )}
+          <SummaryCard space={selectedSpace} slot={selectedSlot} />
+          <button
+            type="button"
+            onClick={confirm}
+            disabled={submitting}
+            className="mt-4 w-full rounded-xl bg-teal-700 px-4 py-3 font-bold text-white disabled:bg-slate-300"
+          >
+            ยืนยันการจอง
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setStep('select')
+              setError(null)
+            }}
+            className="mt-2 w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-700"
+          >
+            กลับ
+          </button>
+        </section>
+      </main>
+    )
+  }
 
   return (
     <main className="mx-auto max-w-4xl p-4 md:p-8">
       <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm md:p-8">
         <h1 className="text-2xl font-bold text-slate-800">จองพื้นที่ในห้องสมุด</h1>
         <Steps current={0} />
+
+        {/* ชั่วคราว: เลือกผู้ใช้ตัวอย่างเป็นผู้จอง จนกว่าจะมีระบบยืนยันตัวตน (Q-01) */}
+        <label htmlFor="space-user" className="mt-4 block text-sm text-slate-500">
+          ผู้จอง
+        </label>
+        <select
+          id="space-user"
+          value={userId}
+          onChange={(event) => setUserId(event.target.value)}
+          className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2"
+        >
+          {users.map((user) => (
+            <option key={user.userId} value={user.userId}>
+              {user.name} ({user.userId})
+            </option>
+          ))}
+        </select>
 
         <p id="space-list-label" className="mt-4 text-sm text-slate-500">
           พื้นที่ที่ใช้งานได้
@@ -129,6 +288,15 @@ export default function SpaceBookingPage({ client = api }) {
             </ul>
           </>
         )}
+
+        <button
+          type="button"
+          onClick={() => setStep('confirm')}
+          disabled={!selectedSlot || !userId}
+          className="mt-4 w-full rounded-xl bg-teal-700 px-4 py-3 font-bold text-white disabled:bg-slate-300"
+        >
+          ถัดไป
+        </button>
       </section>
     </main>
   )

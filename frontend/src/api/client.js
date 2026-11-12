@@ -27,6 +27,28 @@ export const api = {
     }
     return res.json()
   },
+  // CON-ELG-01, Q-01: ผู้ใช้ตัวอย่างให้เลือกเป็นผู้จอง (ชั่วคราวจนกว่าจะมี 001/002)
+  async listSpaceUsers() {
+    const res = await fetch(`${BASE}/space-users`)
+    if (!res.ok) {
+      throw new Error(`Space users request failed: ${res.status}`)
+    }
+    return res.json()
+  },
+  // FR-BKG-02, FR-BKG-03: ยืนยันการจอง (POST /api/reservations) error มี .status ให้หน้าจอแยก 409 / 403
+  async createReservation({ userId, spaceId, date, startTime, endTime }) {
+    const res = await fetch(`${BASE}/reservations`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId, spaceId, date, startTime, endTime }),
+    })
+    if (!res.ok) {
+      const error = new Error(`Reservation failed: ${res.status}`)
+      error.status = res.status
+      throw error
+    }
+    return res.json()
+  },
   async getSlots({ dateFrom, packageCode }) {
     const q = new URLSearchParams({ date_from: dateFrom, package_code: packageCode })
     const res = await fetch(`${BASE}/slots?${q}`)
