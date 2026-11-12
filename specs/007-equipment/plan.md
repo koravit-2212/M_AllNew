@@ -31,12 +31,23 @@ Hosting: Docker / K8s (optional) | ทีมเลือกเอง ไม่�
 - POST /api/loan-requests -> สร้างคำขอยืม (FR-EQP-02, FR-EQP-03)
 	- input: student_id, equipment_type_id, quantity
 	- output: request id, status=pending หรือ error(insufficient)
+- GET /api/loan-requests -> รายการคำขอที่รอเจ้าหน้าที่ตรวจ พร้อมข้อมูลนักศึกษาและรายการค้างคืน (FR-EQP-03, หน้าจอ Pending requests list) [เพิ่ม 2569-11-12 จาก rtm F-03]
+- GET /api/students -> รายชื่อนักศึกษาตัวอย่างให้หน้านักศึกษาเลือก ชั่วคราวจนกว่าจะมีล็อกอิน (Q-05) [เพิ่ม 2569-11-12]
 - GET /api/loan-requests/{id} -> ดูสถานะคำขอ (FR-EQP-02)
 - POST /api/loan-requests/{id}/approve -> เจ้าหน้าที่อนุมัติ (FR-EQP-03, FR-EQP-04)
 	- input: approver_id, action(approve/decline), optional: override=true
 	- side-effect: สร้าง loan_record, ปรับ stock, set due_date ตาม equipment_type.default_loan_days
-- POST /api/loan-requests/{id}/override -> เจ้าหน้าที่ที่มีสิทธิ์ปลดล็อก (ASM-02)
-- POST /api/loan-requests/{id}/return -> ทำรายการคืน (update loan_record status, adjust stock)
+- POST /api/loan-requests/{id}/override -> เจ้าหน้าที่ปลดล็อก (ASM-02) ไม่บังคับเหตุผล (Q-04) ทุกคนกดได้จนกว่าจะมีล็อกอิน (Q-05)
+- ~~POST /api/loan-requests/{id}/return~~ ไม่ทำในฟีเจอร์นี้ spec ไม่มี FR การคืน (Q-09)
+- หมายเหตุ 2569-11-12: approve ไม่มี action decline เพราะ spec ไม่มี FR ปฏิเสธคำขอ และ override แยกเป็น endpoint ของตัวเอง
+
+ค่าที่ตั้งได้ (ตัวเลขและกฎจาก spec อยู่ที่เดียว)
+| ค่า | ไฟล์ | ที่มา |
+|---|---|---|
+| `EQUIPMENT_LOAN_DAYS` (1 วันทุกประเภท) | `backend/app/config.py` | FR-EQP-04, ASM-03, Q-03 |
+| `LIBRARY_TIMEZONE` (Asia/Bangkok) | `backend/app/config.py` | Q-12 |
+| `EQUIPMENT_MAX_QUANTITY_PER_REQUEST` (1) | `backend/app/config.py` | Q-11 |
+| `EQUIPMENT_REQUEST_QUANTITY` (1) | `frontend/src/config.js` | Q-11 |
 
 หน้าจอ:
 - Student: Equipment list, Request form (รองรับ AC-EQP-01)

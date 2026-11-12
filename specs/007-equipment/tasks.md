@@ -209,6 +209,26 @@
 - ที่มา: บั๊กที่ /testcases พบ ทีมสั่งเพิ่ม task 2569-11-12
 - สถานะ: เสร็จ
 
+### T-16 แยกข้อความเมื่อส่งคำขอไม่สำเร็จ: อุปกรณ์ไม่พอ กับเหตุอื่น
+- รองรับ: FR-EQP-05, Q-10
+- ตรวจด้วย: AC-EQP-03 (TC-EQP-03-4)
+- ไฟล์ที่แตะ: `frontend/src/api/client.js`, `frontend/src/pages/EquipmentLoanPage.jsx`, `frontend/src/__tests__/EquipmentLoanPage.test.jsx`
+- แบบหน้าจอ: UI-EQP-01 (สถานะอุปกรณ์หมด)
+- ต้องทำหลัง: T-15
+- เสร็จเมื่อ: 409 แสดง "ไม่สามารถยืมได้" เหตุอื่นแสดง "ส่งคำขอไม่สำเร็จ กรุณาลองใหม่" และ test เดิมทั้งหมดยังผ่าน
+- ที่มา: rtm F-02
+- สถานะ: พร้อมทำ
+
+### T-17 จำกัดครั้งละ 1 ชิ้นต่อคำขอ และย้ายตัวเลขไป config
+- รองรับ: FR-EQP-02, Q-11
+- ตรวจด้วย: AC-EQP-03
+- ไฟล์ที่แตะ: `backend/app/config.py`, `backend/app/services/equipment_service.py`, `backend/tests/test_AC_EQP_03_quantity_limit.py`, `frontend/src/config.js`, `frontend/src/pages/EquipmentLoanPage.jsx`
+- แบบหน้าจอ: ไม่มี
+- ต้องทำหลัง: T-16
+- เสร็จเมื่อ: ขอเกิน `EQUIPMENT_MAX_QUANTITY_PER_REQUEST` ได้ "ไม่สามารถยืมได้" และไม่สร้างคำขอ หน้าจอใช้ค่าจาก `frontend/src/config.js` และ test เดิมทั้งหมดยังผ่าน
+- ที่มา: rtm F-04
+- สถานะ: พร้อมทำ
+
 ## ตารางตรวจความครบ
 
 ### 1. AC กับ task
@@ -216,7 +236,7 @@
 |---|---|
 | AC-EQP-01 | T-03, T-04 |
 | AC-EQP-02 | T-05, T-06, T-07, T-08, T-13 |
-| AC-EQP-03 | T-09, T-10, T-15 |
+| AC-EQP-03 | T-09, T-10, T-15, T-16, T-17 |
 | AC-EQP-04 | T-11, T-12, T-14 |
 
 ### 2. Constraint กับ task
