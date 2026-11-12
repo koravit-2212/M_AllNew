@@ -14,6 +14,10 @@ class FileNotFound(Exception):
     """ไม่พบไฟล์ที่เลือก"""
 
 
+class PrinterNotReady(Exception):
+    """ไม่มีเครื่องพิมพ์ที่พร้อมใช้งาน (FR-PRT-05)"""
+
+
 class InvalidColorMode(Exception):
     """ชนิดการพิมพ์ไม่อยู่ในตัวเลือก"""
 
@@ -56,13 +60,16 @@ def ready_printer(store: PrintStore):
 
 
 def submit_print_job(store: PrintStore, file_id: str, pages: int, copies: int, color_mode: str, user_id: str = '') -> PrintJob:
-    """FR-PRT-03, IF-PRN-01: ส่งงานไปยังเครื่องปริ้นผ่าน spooler และบันทึกข้อมูลการใช้บริการ
+    """FR-PRT-03, FR-PRT-05, IF-PRN-01: ส่งงานไปยังเครื่องปริ้นผ่าน spooler และบันทึกข้อมูลการใช้บริการ
     Q-08: ยังไม่มีล็อกอิน user_id เป็นค่าว่าง
     """
 
     get_file(store, file_id)
     cost = calculate_cost(pages, copies, color_mode)
     printer = ready_printer(store)
+    # FR-PRT-05: เครื่องพิมพ์ไม่พร้อม แจ้งเตือนและไม่ส่งงาน ไม่บันทึกงาน
+    if printer is None:
+        raise PrinterNotReady()
     job = PrintJob(
         printjob_id=f'JOB-{len(store.jobs) + 1:04d}',
         user_id=user_id,
@@ -72,7 +79,7 @@ def submit_print_job(store: PrintStore, file_id: str, pages: int, copies: int, c
         color_mode=color_mode,
         total_cost=cost['estimated_cost'],
         status='sent',
-        printer_id=printer.printer_id if printer else '',
+        printer_id=printer.printer_id,
     )
     store.spooler.send(job.printer_id, job)
     store.jobs[job.printjob_id] = job
@@ -95,3 +102,9 @@ def job_payload(store: PrintStore, job: PrintJob) -> dict:
         'total_cost': job.total_cost,
         'printer_id': job.printer_id,
     }
+
+
+def printers_status(store: PrintStore) -> list[dict]:
+    """FR-PRT-05, IF-PRN-01: สถานะเครื่องพิมพ์ทุกเครื่อง"""
+
+    return [{'printer_id': p.printer_id, 'status': p.status, 'ready': p.is_ready} for p in store.printers]

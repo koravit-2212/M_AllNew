@@ -859,3 +859,7 @@
   - ไฟล์ที่แตะ: `frontend/src/api/client.js`, `frontend/src/pages/PrintPage.jsx`, `frontend/src/__tests__/PrintPage.test.jsx`
   - ผล test: หลังบ้าน 14 passed, หน้าจอ 11 passed
   - ข้อความตาม UI-PRT-01: "ถัดไป", "ส่งงานพิมพ์แล้ว", "บันทึกข้อมูลการใช้บริการแล้ว", การ์ด ไฟล์ / จำนวน / ค่าใช้บริการ ขั้นยืนยันใช้การ์ดเดียวกัน + "ยืนยันการพิมพ์" และ "กลับ"
+- T-07 ไม่ส่งงานเมื่อเครื่องพิมพ์ไม่พร้อม และเปิด API สถานะเครื่องพิมพ์
+  - ไฟล์ที่แตะ: `backend/app/services/printing_service.py`, `backend/app/api/printing.py`, `backend/tests/test_AC_PRT_03_printer_not_ready.py`
+  - ผล test: หลังบ้าน 16 passed
+  - submit ตอบ 409 "เครื่องพิมพ์ไม่พร้อมใช้งาน" ไม่ส่ง spooler ไม่บันทึกงาน เพิ่ม GET /api/printers/status (มีใน plan ข้อ 4)

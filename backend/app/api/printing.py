@@ -5,10 +5,12 @@ from app.models.printing import PrintStore, build_seed_print_store
 from app.services.printing_service import (
     FileNotFound,
     InvalidColorMode,
+    PrinterNotReady,
     allowed_color_modes,
     calculate_cost,
     get_file,
     job_payload,
+    printers_status,
     register_file,
     submit_print_job,
 )
@@ -79,7 +81,9 @@ class SubmitIn(BaseModel):
 
 @router.post('/print/submit', status_code=201)
 def submit_print(body: SubmitIn, store: PrintStore = Depends(get_print_store)) -> dict:
-    """FR-PRT-03, IF-PRN-01: ยืนยันการพิมพ์ ส่งงานไป spooler และบันทึกการใช้บริการ"""
+    """FR-PRT-03, IF-PRN-01: ยืนยันการพิมพ์ ส่งงานไป spooler และบันทึกการใช้บริการ
+    FR-PRT-05: เครื่องพิมพ์ไม่พร้อม ตอบ 409 "เครื่องพิมพ์ไม่พร้อมใช้งาน" และไม่ส่งงาน
+    """
 
     try:
         job = submit_print_job(store, body.file_id, body.pages, body.copies, body.color_mode)
@@ -87,6 +91,8 @@ def submit_print(body: SubmitIn, store: PrintStore = Depends(get_print_store)) -
         raise HTTPException(status_code=404, detail='File not found')
     except InvalidColorMode:
         raise HTTPException(status_code=422, detail='Invalid color mode')
+    except PrinterNotReady:
+        raise HTTPException(status_code=409, detail='เครื่องพิมพ์ไม่พร้อมใช้งาน')
     return job_payload(store, job)
 
 
@@ -98,3 +104,10 @@ def get_print_job(printjob_id: str, store: PrintStore = Depends(get_print_store)
     if job is None:
         raise HTTPException(status_code=404, detail='Print job not found')
     return job_payload(store, job)
+
+
+@router.get('/printers/status')
+def get_printers_status(store: PrintStore = Depends(get_print_store)) -> dict:
+    """FR-PRT-05, IF-PRN-01: สถานะเครื่องพิมพ์"""
+
+    return {'printers': printers_status(store)}
