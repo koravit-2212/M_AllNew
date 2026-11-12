@@ -863,3 +863,7 @@
   - ไฟล์ที่แตะ: `backend/app/services/printing_service.py`, `backend/app/api/printing.py`, `backend/tests/test_AC_PRT_03_printer_not_ready.py`
   - ผล test: หลังบ้าน 16 passed
   - submit ตอบ 409 "เครื่องพิมพ์ไม่พร้อมใช้งาน" ไม่ส่ง spooler ไม่บันทึกงาน เพิ่ม GET /api/printers/status (มีใน plan ข้อ 4)
+- T-08 แสดงสถานะ "เครื่องพิมพ์ไม่พร้อมใช้งาน" และปุ่มลองใหม่
+  - ไฟล์ที่แตะ: `frontend/src/pages/PrintPage.jsx`, `frontend/src/__tests__/PrintPage.test.jsx`
+  - ผล test: หลังบ้าน 16 passed, หน้าจอ 12 passed
+  - ข้อความตาม UI-PRT-01: "เครื่องพิมพ์ไม่พร้อมใช้งาน", "ยังไม่ได้ส่งงานพิมพ์ กรุณาลองใหม่หรือติดต่อเจ้าหน้าที่", ปุ่ม "ลองใหม่" (ส่งงานเดิมอีกครั้ง)

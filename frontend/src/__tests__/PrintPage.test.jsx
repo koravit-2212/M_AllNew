@@ -1,5 +1,6 @@
 // T-04 (FR-PRT-01, FR-PRT-02, NFR-USB-01) ตรวจด้วย AC-PRT-01
 // T-06 (FR-PRT-03, NFR-USB-01) ตรวจด้วย AC-PRT-02
+// T-08 (FR-PRT-05, NFR-USB-01) ตรวจด้วย AC-PRT-03
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { vi } from 'vitest'
 
@@ -90,5 +91,29 @@ describe('AC-PRT-02 ส่งงานพิมพ์สำเร็จ', () => 
     fireEvent.click(screen.getByRole('button', { name: 'ยืนยันการพิมพ์' }))
     expect(await screen.findByText('ส่งงานพิมพ์ไม่สำเร็จ กรุณาลองใหม่')).toBeTruthy()
     expect(screen.queryByText('ส่งงานพิมพ์แล้ว')).toBeNull()
+  })
+})
+
+describe('AC-PRT-03 เครื่องพิมพ์ไม่พร้อมใช้งาน', () => {
+  it('AC-PRT-03 ยืนยันแล้วหลังบ้านตอบ 409 เห็นเครื่องพิมพ์ไม่พร้อมใช้งาน และกดลองใหม่ได้', async () => {
+    // Given เครื่องปริ้นไม่พร้อมใช้งาน (ครั้งแรก) แล้วพร้อม (ครั้งที่สอง)
+    const submitPrintJob = vi
+      .fn()
+      .mockRejectedValueOnce(Object.assign(new Error('Print submit failed: 409'), { status: 409 }))
+      .mockResolvedValueOnce({ printjob_id: 'JOB-0001', status: 'sent', filename: 'report.pdf', total_pages: 24, total_cost: 24 })
+    const client = makeClient(submitPrintJob)
+    await goToConfirm(client)
+
+    // When นักศึกษายืนยันการพิมพ์
+    fireEvent.click(screen.getByRole('button', { name: 'ยืนยันการพิมพ์' }))
+
+    // Then ระบบแจ้งเตือนผู้ใช้และไม่ส่งงานพิมพ์
+    expect(await screen.findByText('เครื่องพิมพ์ไม่พร้อมใช้งาน')).toBeTruthy()
+    expect(screen.getByText('ยังไม่ได้ส่งงานพิมพ์ กรุณาลองใหม่หรือติดต่อเจ้าหน้าที่')).toBeTruthy()
+    expect(screen.queryByText('ส่งงานพิมพ์แล้ว')).toBeNull()
+
+    fireEvent.click(screen.getByRole('button', { name: 'ลองใหม่' }))
+    expect(await screen.findByText('ส่งงานพิมพ์แล้ว')).toBeTruthy()
+    expect(submitPrintJob).toHaveBeenCalledTimes(2)
   })
 })

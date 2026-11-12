@@ -4,7 +4,7 @@ import { api } from '../api/client.js'
 
 // FR-PRT-01, FR-PRT-02, FR-PRT-03, NFR-USB-01
 // หน้าปริ้นเอกสาร (UI-PRT-01) ขั้น 1 เลือกไฟล์และตัวเลือก ขั้น 2 ยืนยัน ขั้น 3 ผล
-// เครื่องพิมพ์ไม่พร้อมเพิ่มใน T-08 ไฟล์ไม่รองรับเพิ่มใน T-10
+// FR-PRT-05: เครื่องพิมพ์ไม่พร้อม (409) แจ้งเตือนและให้ลองใหม่ ไฟล์ไม่รองรับเพิ่มใน T-10
 
 const STEPS = ['1 เลือกไฟล์', '2 ยืนยัน', '3 ผล']
 
@@ -55,7 +55,7 @@ export default function PrintPage({ client = api }) {
   // step: 'select' | 'confirm' | 'done'
   const [step, setStep] = useState('select')
   const [job, setJob] = useState(null)
-  // null | 'failed' (Q-09)
+  // null | 'printer_not_ready' (409, FR-PRT-05) | 'failed' (Q-09)
   const [submitError, setSubmitError] = useState(null)
   const [submitting, setSubmitting] = useState(false)
 
@@ -100,11 +100,34 @@ export default function PrintPage({ client = api }) {
       const result = await client.submitPrintJob({ fileId: file.id, pages: options.pages, copies: options.copies, colorMode: options.color_mode })
       setJob({ ...result, filename: result.filename || file.name })
       setStep('done')
-    } catch {
-      setSubmitError('failed')
+    } catch (error) {
+      setSubmitError(error?.status === 409 ? 'printer_not_ready' : 'failed')
     } finally {
       setSubmitting(false)
     }
+  }
+
+  if (step === 'confirm' && submitError === 'printer_not_ready') {
+    return (
+      <main className="mx-auto max-w-4xl p-4 md:p-8">
+        <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm md:p-8">
+          <h1 className="text-2xl font-bold text-slate-800">ปริ้นเอกสาร</h1>
+          <Steps current={2} />
+          <div className="mt-4 rounded-2xl border border-rose-200 bg-rose-50 p-6 text-center text-rose-900" role="alert">
+            <b className="block text-xl">เครื่องพิมพ์ไม่พร้อมใช้งาน</b>
+            <small className="mt-1 block text-sm">ยังไม่ได้ส่งงานพิมพ์ กรุณาลองใหม่หรือติดต่อเจ้าหน้าที่</small>
+          </div>
+          <button
+            type="button"
+            onClick={submit}
+            disabled={submitting}
+            className="mt-4 w-full rounded-xl border border-teal-700 bg-white px-4 py-3 font-bold text-teal-700 disabled:opacity-50"
+          >
+            ลองใหม่
+          </button>
+        </section>
+      </main>
+    )
   }
 
   if (step === 'done' && job) {
