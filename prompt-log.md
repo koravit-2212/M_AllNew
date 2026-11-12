@@ -1006,3 +1006,10 @@
 
 - ทีมยืนยันว่าลอง T-15 และแถว "คน" TC-EQP-02-6, TC-EQP-04-6 แล้วผ่านทั้งหมด จึงเปลี่ยน T-15 เป็น "เสร็จ"
 - ขั้นต่อไป: /verify specs/007-equipment
+
+## 2026-11-12 คำสั่ง: /verify specs/007-equipment
+
+- สร้าง `specs/007-equipment/rtm.md` ครั้งแรก ไม่แก้โค้ด test spec plan tasks
+- ผล test: 71 ผ่าน 0 ไม่ผ่าน (pytest 43, vitest 28)
+- ตารางไปข้างหน้า 8 แถว: ครบ 2 (FR-EQP-01, FR-EQP-06), ยังไม่ถึง 0, รอ 0, ช่องโหว่ 6 (FR-EQP-02..05, NFR-USB-01, CON-LNS-02)
+- ข้อค้นพบใหม่: F-01 (รายการค้างคืนมาจาก seed เท่านั้น CON-LNS-02 ไม่มี AC), F-02 (ทุกความล้มเหลวแสดง "ไม่สามารถยืมได้"), F-03 (GET /api/loan-requests และรายการคำขอไม่มีใน plan/mockup), F-04 (REQUEST_QUANTITY = 1 ฝังในหน้า), F-05 (Asia/Bangkok อ้าง glossary โดเมนอื่น), F-06 (NFR-USB-01 ไม่มี AC)
