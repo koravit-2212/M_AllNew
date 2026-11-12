@@ -1,6 +1,7 @@
 // T-04 (FR-PRT-01, FR-PRT-02, NFR-USB-01) ตรวจด้วย AC-PRT-01
 // T-06 (FR-PRT-03, NFR-USB-01) ตรวจด้วย AC-PRT-02
 // T-08 (FR-PRT-05, NFR-USB-01) ตรวจด้วย AC-PRT-03
+// T-10 (FR-PRT-04, CON-FILE-01, NFR-USB-01) ตรวจด้วย AC-PRT-04
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { vi } from 'vitest'
 
@@ -115,5 +116,29 @@ describe('AC-PRT-03 เครื่องพิมพ์ไม่พร้อม
     fireEvent.click(screen.getByRole('button', { name: 'ลองใหม่' }))
     expect(await screen.findByText('ส่งงานพิมพ์แล้ว')).toBeTruthy()
     expect(submitPrintJob).toHaveBeenCalledTimes(2)
+  })
+})
+
+describe('AC-PRT-04 ไฟล์ไม่รองรับ', () => {
+  it('AC-PRT-04 เลือก setup.exe แล้วเห็นไม่รองรับไฟล์ชนิดนี้ พร้อมชนิดที่รองรับ และกดถัดไปไม่ได้', async () => {
+    // Given ไฟล์ที่เลือกไม่รองรับ (หลังบ้านตอบ 415)
+    const client = makeClient()
+    client.uploadPrintFile = vi.fn().mockRejectedValue(
+      Object.assign(new Error('Print upload failed: 415'), {
+        status: 415,
+        detail: { message: 'ไม่รองรับไฟล์ชนิดนี้', allowed_extensions: ['pdf', 'docx'], max_size_mb: 50 },
+      }),
+    )
+    render(<PrintPage client={client} />)
+
+    // When นักศึกษาเลือกไฟล์
+    await chooseFile('setup.exe', 1000, 'application/octet-stream')
+
+    // Then ระบบแจ้งเตือนและไม่ให้ดำเนินการพิมพ์ต่อ
+    expect(await screen.findByText('ไม่รองรับไฟล์ชนิดนี้')).toBeTruthy()
+    expect(screen.getByText(/รองรับ \.pdf, \.docx ขนาดไม่เกิน 50 MB/)).toBeTruthy()
+    expect(screen.getByText('setup.exe')).toBeTruthy()
+    expect(screen.getByRole('button', { name: 'ถัดไป' }).disabled).toBe(true)
+    expect(client.getPrintOptions).not.toHaveBeenCalled()
   })
 })

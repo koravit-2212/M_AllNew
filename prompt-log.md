@@ -871,3 +871,7 @@
   - ไฟล์ที่แตะ: `backend/app/services/printing_service.py`, `backend/app/api/printing.py`, `backend/tests/test_AC_PRT_04_unsupported_file.py`
   - ผล test: หลังบ้าน 18 passed
   - upload ตอบ 415 พร้อม detail {message: "ไม่รองรับไฟล์ชนิดนี้", allowed_extensions, max_size_mb} จาก config ไม่บันทึกไฟล์ ไม่ได้ file_id นามสกุลไม่สนตัวพิมพ์เล็กใหญ่ ขนาด 50 MB พอดีรับได้
+- T-10 แสดงคำเตือนไฟล์ไม่รองรับและปิดปุ่มถัดไป
+  - ไฟล์ที่แตะ: `frontend/src/pages/PrintPage.jsx`, `frontend/src/__tests__/PrintPage.test.jsx`
+  - ผล test: หลังบ้าน 18 passed, หน้าจอ 13 passed
+  - ข้อความตาม UI-PRT-01: "ไม่รองรับไฟล์ชนิดนี้" และ "รองรับ .pdf, .docx, ... ขนาดไม่เกิน 50 MB" (รายการและขนาดมาจากหลังบ้าน ไม่ฝังในหน้า) ปุ่ม "ถัดไป" กดไม่ได้

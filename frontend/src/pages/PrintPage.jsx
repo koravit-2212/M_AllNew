@@ -4,7 +4,8 @@ import { api } from '../api/client.js'
 
 // FR-PRT-01, FR-PRT-02, FR-PRT-03, NFR-USB-01
 // หน้าปริ้นเอกสาร (UI-PRT-01) ขั้น 1 เลือกไฟล์และตัวเลือก ขั้น 2 ยืนยัน ขั้น 3 ผล
-// FR-PRT-05: เครื่องพิมพ์ไม่พร้อม (409) แจ้งเตือนและให้ลองใหม่ ไฟล์ไม่รองรับเพิ่มใน T-10
+// FR-PRT-05: เครื่องพิมพ์ไม่พร้อม (409) แจ้งเตือนและให้ลองใหม่
+// FR-PRT-04, CON-FILE-01: ไฟล์ไม่รองรับ (415) แจ้งเตือนพร้อมชนิดและขนาดที่รองรับ และกดถัดไปไม่ได้
 
 const STEPS = ['1 เลือกไฟล์', '2 ยืนยัน', '3 ผล']
 
@@ -52,6 +53,8 @@ export default function PrintPage({ client = api }) {
   const [pagesInput, setPagesInput] = useState('1')
   const [copiesInput, setCopiesInput] = useState('1')
   const [options, setOptions] = useState(null)
+  // FR-PRT-04: { name, allowed: [...], maxSizeMb } เมื่อไฟล์ไม่รองรับ
+  const [rejectedFile, setRejectedFile] = useState(null)
   // step: 'select' | 'confirm' | 'done'
   const [step, setStep] = useState('select')
   const [job, setJob] = useState(null)
@@ -67,11 +70,19 @@ export default function PrintPage({ client = api }) {
     const picked = event.target.files?.[0]
     if (!picked) return
     setOptions(null)
+    setRejectedFile(null)
     try {
       const uploaded = await client.uploadPrintFile({ filename: picked.name, contentType: picked.type, sizeBytes: picked.size })
       setFile({ id: uploaded.file_id, name: picked.name, size: picked.size })
-    } catch {
+    } catch (error) {
       setFile(null)
+      if (error?.status === 415) {
+        setRejectedFile({
+          name: picked.name,
+          allowed: error.detail?.allowed_extensions ?? [],
+          maxSizeMb: error.detail?.max_size_mb,
+        })
+      }
     }
   }
 
@@ -203,6 +214,15 @@ export default function PrintPage({ client = api }) {
           <p className="mt-1 text-sm text-slate-700">
             {file.name} ({formatSize(file.size)})
           </p>
+        )}
+        {rejectedFile && (
+          <>
+            <p className="mt-1 text-sm text-slate-700">{rejectedFile.name}</p>
+            <div className="mt-3 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800" role="alert">
+              <b className="block text-base">ไม่รองรับไฟล์ชนิดนี้</b>
+              รองรับ {rejectedFile.allowed.map((ext) => `.${ext}`).join(', ')} ขนาดไม่เกิน {rejectedFile.maxSizeMb} MB
+            </div>
+          </>
         )}
 
         {options && (
