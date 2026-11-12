@@ -1,12 +1,16 @@
-// โครงเริ่มต้นของรายวิชา: ยังไม่มีหน้าจอของ task ใด ๆ
-// หน้าจอจริงจะถูกสร้างใน src/pages/ ตาม task ใน tasks.md ทีละหน้า
+import { useState } from 'react'
+
+import BookDetailPage from './pages/BookDetailPage.jsx'
+import SearchPage from './pages/SearchPage.jsx'
+
+// FR-SRC-02, FR-SRC-03, AC-SRC-04
+// App root ทำหน้าที่สลับระหว่าง Search Page และ Book Detail Page ตามการเลือกหนังสือ
 export default function App() {
-  return (
-    <main className="mx-auto max-w-2xl p-6">
-      <h1 className="text-2xl font-bold text-teal-800">ระบบจองคิวตรวจสุขภาพ</h1>
-      <p className="mt-2 text-slate-600">
-        โครงหน้าจอพร้อมแล้ว หน้าจอของแต่ละ task จะอยู่ในโฟลเดอร์ src/pages/
-      </p>
-    </main>
-  )
+  const [selectedBookId, setSelectedBookId] = useState(null)
+
+  if (selectedBookId) {
+    return <BookDetailPage titleId={selectedBookId} onBack={() => setSelectedBookId(null)} />
+  }
+
+  return <SearchPage onSelectBook={setSelectedBookId} />
 }

@@ -197,6 +197,60 @@
 
 ---
 
+## 2026-11-12 17:00 คำสั่ง: /implement T-06
+
+- เครื่องมือ: Copilot ใน Codespaces
+- ไฟล์: specs/003-searchBook/tasks.md
+- ไฟล์ที่สร้าง/แก้: backend/app/api/search.py, backend/app/services/search_service.py, backend/tests/test_AC_SRC_02_no_results.py
+- สรุปงาน: ปรับ API /api/search ให้คืน `results: []` พร้อม `message: "ไม่พบข้อมูลหนังสือ"` เมื่อคำค้นไม่มีผล และยืนยันว่า UI สามารถใช้ข้อมูลนี้ได้โดยไม่แสดงรายการเก่า
+- ผล test: `cd /workspaces/M_AllNew/backend && . ../.venv/bin/activate && pytest -q tests/test_AC_SRC_02_no_results.py && cd /workspaces/M_AllNew/frontend && npm test -- --run` → Backend 1 passed, Frontend 4 passed, exit code 0
+- สิ่งที่เกือบต้องเดาแต่ถามแทน: ไม่มี; ใช้ spec.md / tasks.md เป็นแหล่งความจริง และยึด AC-SRC-02 อย่างตรงไปตรงมา
+
+## 2026-11-12 17:25 คำสั่ง: /implement T-07
+
+- เครื่องมือ: Copilot ใน Codespaces
+- ไฟล์: specs/003-searchBook/tasks.md
+- ไฟล์ที่สร้าง/แก้: backend/app/api/search.py, backend/app/services/search_service.py, backend/tests/test_AC_SRC_03_partial_results.py
+- สรุปงาน: เพิ่ม contract สำหรับ partial-results ใน Search API โดยคืน `partial: true`, `message: "แสดงผลลัพธ์บางส่วน"`, และ `warning` เพื่อให้ UI สามารถแจ้งเตือนผู้ใช้ได้โดยไม่ปิดบริการทั้งหมด
+- ผล test: `cd /workspaces/M_AllNew/backend && . ../.venv/bin/activate && pytest -q tests/test_AC_SRC_03_partial_results.py` → 1 passed, exit code 0
+- สิ่งที่เกือบต้องเดาแต่ถามแทน: ไม่มี; task นี้มีความชัดเจนจาก AC-SRC-03 และไม่ได้แตะ T-08/T-09
+
+## 2026-11-12 17:40 คำสั่ง: /implement T-08
+
+- เครื่องมือ: Copilot ใน Codespaces
+- ไฟล์: specs/003-searchBook/tasks.md
+- ไฟล์ที่สร้าง/แก้: frontend/src/__tests__/SearchPage.test.jsx
+- สรุปงาน: ปรับ regression test ให้ครอบคลุมสถานะ partial results บนหน้า Search Page โดยต้องแสดงข้อความ “แสดงผลลัพธ์บางส่วน” พร้อมผลลัพธ์ที่สามารถใช้งานได้ต่อไป
+- ผล test: `cd /workspaces/M_AllNew/frontend && npm test -- --run` → 2 files passed, 4 tests passed, exit code 0
+- สิ่งที่เกือบต้องเดาแต่ถามแทน: ไม่มี; mockup UI-SRC-01 ชัดเจนว่าควรมี banner แบบ amber และยังมีรายการผลลัพธ์ที่ใช้งานได้
+
+## 2026-11-12 18:00 คำสั่ง: /implement T-09
+
+- เครื่องมือ: Copilot ใน Codespaces
+- ไฟล์: specs/003-searchBook/tasks.md
+- ไฟล์ที่สร้าง/แก้: backend/app/api/search.py, backend/app/services/search_service.py, frontend/src/pages/SearchPage.jsx, frontend/src/__tests__/SearchPage.test.jsx
+- สรุปงาน: เพิ่ม branching ระหว่าง no-result, partial result, และ database unavailable; สำหรับกรณี DB ล่ม API จะคืน message "ฐานข้อมูลหนังสือไม่พร้อมใช้งาน" และหน้า Search Page จะแสดงเฉพาะข้อความนั้น ไม่แสดงผลผิดพลาดหรือ banner partial
+- ผล test: `cd /workspaces/M_AllNew/backend && . ../.venv/bin/activate && pytest -q tests/test_AC_SRC_03_partial_results_and_db_unavailable.py && cd /workspaces/M_AllNew/frontend && npm test -- --run` → Backend 1 passed, Frontend 2 files passed / 5 tests passed, exit code 0
+- สิ่งที่เกือบต้องเดาแต่ถามแทน: ไม่มี; spec และ mockup ชัดเจนว่าควรแยก “ไม่มีผลลัพธ์” กับ “ฐานข้อมูลไม่พร้อมใช้งาน” อย่างชัดเจน
+
+## 2026-11-12 19:05 คำสั่ง: /implement T-10
+
+- เครื่องมือ: Copilot ใน Codespaces
+- ไฟล์: specs/003-searchBook/tasks.md
+- ไฟล์ที่สร้าง/แก้: backend/app/api/books.py, backend/app/services/book_detail_service.py, backend/app/main.py, backend/tests/test_AC_SRC_04_book_detail_fields.py
+- สรุปงาน: สร้าง API GET /api/books/{title_id} เพื่อคืนรายละเอียดหนังสือแบบ per-copy จากชุดข้อมูล Central DB ตัวอย่าง โดยมี title, authors, isbn, call_number, category, copies, และ aggregated availability; route ถูกติดตั้งใน FastAPI app และคืน 404 เมื่อไม่พบ title_id
+- ผล test: `cd /workspaces/M_AllNew/backend && . ../.venv/bin/activate && pytest -q tests` → 8 passed, exit code 0
+- สิ่งที่เกือบต้องเดาแต่ถามแทน: ไม่มี; spec ระบุชัดเจนว่า AC-SRC-04 ต้องมีชื่อ ผู้แต่ง เลขเรียกหนังสือ/ISBN หมวดหมู่ สถานะยืม-คืน และตำแหน่งจัดเก็บ และโครงสร้างข้อมูลมีอยู่แล้วใน model/book.py และ config.py
+
+## 2026-11-12 19:45 คำสั่ง: /implement T-11
+
+- เครื่องมือ: Copilot ใน Codespaces
+- ไฟล์: specs/003-searchBook/tasks.md
+- ไฟล์ที่สร้าง/แก้: frontend/src/pages/BookDetailPage.jsx, frontend/src/api/client.js, frontend/src/App.jsx, frontend/src/pages/SearchPage.jsx, frontend/src/__tests__/BookDetailPage.test.jsx
+- สรุปงาน: สร้าง Book Detail Page ตาม mockup UI-SRC-02 และเชื่อมต่อกับ API GET /api/books/{title_id}; เมื่อเลือกหนังสือจาก Search Page จะเปิดหน้า detail ที่แสดงชื่อ ผู้แต่ง เลขเรียกหนังสือ ISBN หมวดหมู่ สถานะรวม และรายการ per-copy พร้อมตำแหน่งจัดเก็บ
+- ผล test: `cd /workspaces/M_AllNew/backend && . ../.venv/bin/activate && pytest -q tests && cd /workspaces/M_AllNew/frontend && npm test -- --run` → Backend 8 passed, Frontend 3 files passed / 7 tests passed, exit code 0
+- สิ่งที่เกือบต้องเดาแต่ถามแทน: ไม่มี; mockup UI-SRC-02 และ spec ระบุชัดเจนว่าฟิลด์ขั้นต่ำและลำดับข้อมูลต้องตรงตามสี่องค์ประกอบหลัก: ชื่อ ผู้แต่ง เลขเรียกหนังสือ/ISBN หมวดหมู่ และสถานะรายเล่มพร้อมตำแหน่งจัดเก็บ
+
 ## 2026-09-20 15:30 คำสั่ง: /clarify
 
 - เครื่องมือ: Copilot ใน Codespaces
@@ -269,6 +323,21 @@
   - เฟสแรกที่ลองใช้งานได้จริง: เฟส 1 (`AC-SRC-01`)
 - ข้อสังเกต: feature นี้ไม่มี Open Questions ใน spec.md ปัจจุบัน จึงไม่มี task ที่กำหนดสถานะ "รอ Q-xx"
 - ตารางตรวจความครบและ traceability ได้รวมไว้ใน `tasks.md` เสร็จสิ้น
+
+---
+
+## 2026-11-12 12:30 คำสั่ง: /implement T-01 003-searchBook
+
+- เครื่องมือ: Copilot ใน Codespaces
+- ไฟล์ที่สร้าง/แก้: `backend/app/config.py`, `backend/app/models/book.py`, `backend/app/__init__.py`, `backend/app/models/__init__.py`, `backend/tests/test_AC_SRC_01_book_seed_data.py`
+- ผลลัพธ์ test:
+  - `/workspaces/M_AllNew/.venv/bin/pytest -q tests/test_AC_SRC_01_book_seed_data.py`
+  - ผลลัพธ์: `2 passed in 0.01s`
+- สิ่งที่เกือบต้องเดาแต่ถามแทน: ไม่มี — ข้อกำหนดใน spec, plan, and tasks ถูกอ่านครบและตรงกับ task ที่เลือก
+- สิ่งที่ทำให้เป็นจริง:
+  - `BookTitle` และ `BookCopy` ถูกสร้างใน `backend/app/models/book.py` พร้อม `aggregated_availability` และ `as_detail_payload()` สำหรับ FR-SRC-01/02/03
+  - `BOOK_SEARCH_SEED_DATA` และ `SEARCH_PAGE_SIZE_MIN/MAX` ถูกจัดเก็บใน `backend/app/config.py` เพื่อให้ค่าการค้นหาและ pagination มีจุดศูนย์กลางตาม spec
+  - ข้อมูลตัวอย่างประกอบด้วย title, authors, keywords, isbn, call_number, copies, shelf location เพื่อรองรับ AC-SRC-01 และ AC-SRC-04
 
 ---
 
@@ -402,6 +471,21 @@
   - `audit_log` และ `usage_records` ถูกออกแบบให้เก็บข้อมูลที่จำเป็นเท่านั้น เพื่อให้สอดคล้องกับ DOM-PRV-01 และ CON-AUDIT-01
 
 
+## 2026-11-12 12:45 คำสั่ง: /implement T-02
+
+- เครื่องมือ: Copilot ใน Codespaces
+- ไฟล์ที่สร้าง/แก้: `backend/app/services/search_index.py`, `backend/app/api/health.py`, `backend/app/api/__init__.py`, `backend/app/services/__init__.py`, `backend/app/main.py`, `backend/tests/test_AC_SRC_03_search_health.py`
+- ผลลัพธ์ test:
+  - `/workspaces/M_AllNew/.venv/bin/pytest -q tests/test_AC_SRC_03_search_health.py`
+  - ผลลัพธ์: `1 passed, 1 warning in 0.76s`
+- สิ่งที่เกือบต้องเดาแต่ถามแทน: ไม่มี — ข้อกำหนดใน spec, plan, และ task ชัดเจนว่าต้องมี health endpoint สำหรับ index status และ last sync time
+- สิ่งที่ทำให้เป็นจริง:
+  - `SearchIndexStatus` และ `get_search_index_health()` ใน `backend/app/services/search_index.py` คืนค่า `index_status`, `last_sync_time`, และ `sync_health` ตาม contract ของ plan
+  - `GET /api/health/search` ถูกติดตั้งใน `backend/app/api/health.py` และ `backend/app/main.py` ให้พร้อมเรียกผ่าน FastAPI
+  - test `test_AC_SRC_03_search_health_reports_index_status_and_sync_details` ตรวจ `Given / When / Then` ตาม AC-SRC-03 โดยยืนยันการตอบกลับมีข้อมูลสถานะและเวลา sync ที่จำเป็น
+
+---
+
 ## 2026-09-20 20:30 คำสั่ง: /plan
 
 - เครื่องมือ: Copilot ใน Codespaces
@@ -438,6 +522,22 @@
 - ปรับ `AC-LNS-01` และ `AC-LNS-03` ให้สอดคล้องกับนโยบายแจ้งเตือนและค่าปรับที่ได้ตกลง
 - เพิ่ม `ASM-02` และ `ASM-03` เพื่อบันทึกคำตัดสินใจของทีมให้เป็นข้อสรุปที่ชัดเจน
 - เปลี่ยน Status เป็น Draft v2 และอัปเดตวันที่เป็น 2569-09-20
+
+---
+
+## 2026-11-12 12:45 คำสั่ง: /implement T-03
+
+- เครื่องมือ: Copilot ใน Codespaces
+- ไฟล์ที่สร้าง/แก้: `backend/app/api/search.py`, `backend/app/services/search_service.py`, `backend/app/main.py`, `backend/tests/test_AC_SRC_01_search_api.py`
+- ผลลัพธ์ test:
+  - `/workspaces/M_AllNew/.venv/bin/pytest -q tests`
+  - ผลลัพธ์: `4 passed, 1 warning in 0.65s`
+- สิ่งที่เกือบต้องเดาแต่ถามแทน: ไม่มี — task T-03 มีข้อกำหนดชัดเจนว่าต้องมี `GET /api/search` และรองรับ fuzzy/partial match, pagination, relevance, และ aggregated availability ตาม `spec.md` และ `plan.md`
+- สิ่งที่ทำให้เป็นจริง:
+  - `search_books()` ใน `backend/app/services/search_service.py` ค้นหาจาก seed data แบบ case-insensitive fuzzy/partial match บน `title`, `author`, `keywords`, `isbn`, และ `call_number`
+  - `GET /api/search` ใน `backend/app/api/search.py` คืน payload แบบ title-level พร้อม `results`, `page`, `per_page`, `total`, และ `relevance_score`
+  - `app.include_router(search_router)` ใน `backend/app/main.py` ทำให้ endpoint เปิดใช้งานได้ทันที
+  - test `test_AC_SRC_01_search_api_returns_relevant_title_results_with_pagination` ตรวจ `Given / When / Then` ตาม AC-SRC-01 โดยยืนยัน `Clean Code` ถูกคืนกลับในลำดับความเกี่ยวข้องและมี pagination ที่ถูกต้อง
 
 ---
 
@@ -572,6 +672,23 @@
 
 1. A1: การลบต้องเป็น Soft Delete; บันทึก `is_deleted` (หรือ `status = Inactive/Archived`), `deleted_at` (ISO 8601), และ `deleted_by` (actor id); ซ่อนจากผลการค้นหาแต่ไม่กระทบประวัติการยืม
 2. A2: ฟิลด์บังคับอย่างน้อย `Title`, `Resource Type`, `Call Number`; ถ้ามี `ISBN` ต้องผ่านรูปแบบ ISBN-10 หรือ ISBN-13; วันที่ใช้ ISO 8601 (`YYYY-MM-DD`)
+
+---
+## 2026-11-12 05:40 คำสั่ง: /implement T-04
+
+- เครื่องมือ: Copilot ใน Codespaces
+- ไฟล์ที่สร้าง/แก้: `frontend/src/pages/SearchPage.jsx`, `frontend/src/api/client.js`, `frontend/src/App.jsx`, `frontend/src/__tests__/SearchPage.test.jsx`, `frontend/src/__tests__/setup.test.jsx`
+- ผลลัพธ์ test:
+  - `cd /workspaces/M_AllNew/frontend && npm test -- --run`
+  - ผลลัพธ์: `2 passed (2)`
+- สิ่งที่เกือบต้องเดาแต่ถามแทน: ไม่มี — task T-04 มีเงื่อนไขชัดเจนใน `spec.md` และ mockup ว่าให้ใช้คำค้น fuzzy/partial match, รายการผลลัพธ์ต่อ title, และแสดงสถานะ aggregated availability
+- สิ่งที่ทำให้เป็นจริง:
+  - `SearchPage` ใน `frontend/src/pages/SearchPage.jsx` สร้างฟอร์มค้นหาและแสดงรายการหนังสือแบบ aggregated per-title พร้อม badge ว่าง/ถูกยืม/ผสม และ pagination อัตโนมัติ
+  - `api.searchBooks()` ใน `frontend/src/api/client.js` เรียก `GET /api/search?q={q}&page={page}&per_page={per_page}` ตามสัญญา task และ plan
+  - `App.jsx` เปลี่ยนเป็น render หน้า Search Page เพื่อให้หน้าใช้งานจริงทันที
+  - test `test_AC_SRC_01_search_api_returns_relevant_title_results_with_pagination` (frontend) ตรวจ `Given / When / Then` ตาม AC-SRC-01 โดยยืนยันการค้นหา partial match และแสดงผลที่ตรงกัน
+
+---
 
 ### สิ่งที่แก้ใน spec.md (v1 -> v2)
 

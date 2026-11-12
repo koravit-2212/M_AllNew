@@ -4,6 +4,21 @@
 const BASE = import.meta.env.VITE_API_BASE ?? '/api'
 
 export const api = {
+  async searchBooks({ q, page = 1, per_page = 20 }) {
+    const params = new URLSearchParams({ q, page: String(page), per_page: String(per_page) })
+    const res = await fetch(`${BASE}/search?${params}`)
+    if (!res.ok) {
+      throw new Error(`Search request failed: ${res.status}`)
+    }
+    return res.json()
+  },
+  async getBookDetail(titleId) {
+    const res = await fetch(`${BASE}/books/${encodeURIComponent(titleId)}`)
+    if (!res.ok) {
+      throw new Error(`Book detail request failed: ${res.status}`)
+    }
+    return res.json()
+  },
   async getSlots({ dateFrom, packageCode }) {
     const q = new URLSearchParams({ date_from: dateFrom, package_code: packageCode })
     const res = await fetch(`${BASE}/slots?${q}`)
