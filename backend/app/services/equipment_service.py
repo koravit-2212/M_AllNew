@@ -26,6 +26,10 @@ class RequestNotPending(Exception):
     """คำขอนี้ไม่ได้อยู่ในสถานะรออนุมัติแล้ว"""
 
 
+class StudentBlocked(Exception):
+    """นักศึกษามีรายการค้างคืน การอนุมัติปกติถูกบล็อก ต้อง override (ASM-02, Q-04)"""
+
+
 class InsufficientStock(Exception):
     """จำนวนคงเหลือไม่พอ ตอนส่งคำขอหรือตอนอนุมัติ (FR-EQP-02, FR-EQP-05)"""
 
@@ -75,7 +79,7 @@ def list_pending_requests(store: EquipmentStore) -> list[LoanRequest]:
 def get_request_detail(store: EquipmentStore, request_id: str, today: date | None = None) -> dict:
     """FR-EQP-03, FR-EQP-06, CON-LNS-02: ข้อมูลที่เจ้าหน้าที่ใช้ตรวจก่อนอนุมัติ คือนักศึกษา อุปกรณ์ และรายการค้างคืน
     คำขอของนักศึกษาที่มีรายการค้างคืนยังเป็น pending ไม่อนุมัติเอง ให้เจ้าหน้าที่ตรวจก่อนตัดสินใจ (FR-EQP-06)
-    การบล็อกและ override ตาม ASM-02 ยังไม่ทำ รอ T-14
+    `blocked` บอกว่าอนุมัติปกติไม่ได้ ต้อง override (ASM-02, Q-04)
     """
 
     request = store.requests.get(request_id)
@@ -91,6 +95,7 @@ def get_request_detail(store: EquipmentStore, request_id: str, today: date | Non
         'quantity': request.quantity,
         'student': {'student_id': student.student_id, 'name': student.name},
         'has_outstanding': student.has_outstanding,
+        'blocked': student.has_outstanding,
         'outstanding_items': [dict(item) for item in student.outstanding_items],
         'equipment': {
             'equipment_type_id': equipment.equipment_type_id,
@@ -101,10 +106,17 @@ def get_request_detail(store: EquipmentStore, request_id: str, today: date | Non
     }
 
 
-def approve_request(store: EquipmentStore, request_id: str, approver_id: str, today: date | None = None) -> LoanRecord:
+def approve_request(
+    store: EquipmentStore,
+    request_id: str,
+    approver_id: str,
+    today: date | None = None,
+    override: bool = False,
+) -> LoanRecord:
     """FR-EQP-04, CON-LNS-02: เจ้าหน้าที่อนุมัติ ระบบบันทึกการยืมและลดจำนวนคงเหลือ
     ตรวจจำนวนอีกครั้งภายใต้ lock เพื่อไม่ให้คงเหลือติดลบ (FR-EQP-02)
     กำหนด due date ตามประเภทอุปกรณ์ (ASM-03, Q-03)
+    FR-EQP-06, ASM-02, Q-04: นักศึกษาที่มีรายการค้างคืนถูกบล็อก เว้นแต่เจ้าหน้าที่ override (ไม่บังคับเหตุผล)
     """
 
     with store.lock:
@@ -113,6 +125,8 @@ def approve_request(store: EquipmentStore, request_id: str, approver_id: str, to
             raise RequestNotFound(request_id)
         if request.status != 'pending':
             raise RequestNotPending(request_id)
+        if store.students[request.student_id].has_outstanding and not override:
+            raise StudentBlocked(request.student_id)
         equipment = store.equipment_types[request.equipment_type_id]
         if equipment.available_count < request.quantity:
             raise InsufficientStock(request.equipment_type_id)

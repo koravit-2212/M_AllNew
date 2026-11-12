@@ -1,6 +1,7 @@
 // T-08 (FR-EQP-03, FR-EQP-04, NFR-USB-01) ตรวจด้วย AC-EQP-02
 // T-12 (FR-EQP-06, NFR-USB-01) ตรวจด้วย AC-EQP-04
 // T-13 (FR-EQP-04, Q-03) ตรวจด้วย AC-EQP-02 (กำหนดคืน)
+// T-14 (FR-EQP-06, ASM-02, Q-04) ตรวจด้วย AC-EQP-04 (บล็อกและ override)
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { vi } from 'vitest'
 
@@ -125,5 +126,64 @@ describe('AC-EQP-02 กำหนดคืน (due date) ตามประเภ
     const saved = within(screen.getByLabelText('กำหนดคืนที่บันทึก'))
     expect(saved.getByText('กำหนดคืน')).toBeTruthy()
     expect(saved.getByText(/13 พ\.ย\. 2569/)).toBeTruthy()
+  })
+})
+
+describe('AC-EQP-04 บล็อกการอนุมัติปกติและให้เจ้าหน้าที่ override', () => {
+  it('AC-EQP-04 นักศึกษามีรายการค้างคืน ไม่มีปุ่มอนุมัติปกติ กดปลดล็อกแล้วบันทึกการยืม', async () => {
+    // Given นักศึกษามีรายการค้างคืน
+    // When นักศึกษาขอยืมอุปกรณ์เพิ่ม
+    const client = {
+      listPendingLoanRequests: vi
+        .fn()
+        .mockResolvedValueOnce({
+          items: [
+            {
+              ...PENDING,
+              request_id: 'REQ-0003',
+              student: { student_id: 'S3', name: 'นักศึกษาทดสอบ 3' },
+              has_outstanding: true,
+              blocked: true,
+              outstanding_items: [{ item: 'ของค้าง', days_overdue: 2 }],
+            },
+          ],
+        })
+        .mockResolvedValue({ items: [] }),
+      approveLoanRequest: vi.fn(),
+      overrideLoanRequest: vi.fn().mockResolvedValue({
+        request_id: 'REQ-0003',
+        equipment_name: 'อุปกรณ์ทดสอบ',
+        quantity: 1,
+        available_count: 2,
+        due_date: '2026-11-13',
+        override: true,
+      }),
+    }
+    render(<StaffLoanApprovalPage client={client} />)
+    fireEvent.click(await screen.findByRole('button', { name: /นักศึกษาทดสอบ 3/ }))
+
+    // Then เจ้าหน้าที่ตรวจรายการค้างคืน ระบบบล็อกการอนุมัติปกติ (ASM-02)
+    expect(screen.getByText('มีรายการค้างคืน')).toBeTruthy()
+    expect(screen.getByText('ระบบบล็อกการยืมใหม่จนกว่าจะคืนและชำระค่าปรับ')).toBeTruthy()
+    expect(screen.queryByRole('button', { name: 'อนุมัติการยืม' })).toBeNull()
+
+    // เจ้าหน้าที่ตัดสินใจปลดล็อกเป็นกรณีพิเศษ
+    fireEvent.click(screen.getByRole('button', { name: 'ปลดล็อก (override) เป็นกรณีพิเศษ' }))
+    await waitFor(() => expect(client.overrideLoanRequest).toHaveBeenCalledWith('REQ-0003'))
+    expect(client.approveLoanRequest).not.toHaveBeenCalled()
+    expect(await screen.findByText('บันทึกการยืมแล้ว')).toBeTruthy()
+  })
+
+  it('AC-EQP-04 นักศึกษาไม่มีรายการค้างคืน ไม่มีปุ่ม override', async () => {
+    const client = {
+      listPendingLoanRequests: vi.fn().mockResolvedValue({ items: [PENDING] }),
+      approveLoanRequest: vi.fn(),
+      overrideLoanRequest: vi.fn(),
+    }
+    render(<StaffLoanApprovalPage client={client} />)
+    fireEvent.click(await screen.findByRole('button', { name: /นักศึกษาทดสอบ 1/ }))
+
+    expect(screen.getByRole('button', { name: 'อนุมัติการยืม' })).toBeTruthy()
+    expect(screen.queryByRole('button', { name: 'ปลดล็อก (override) เป็นกรณีพิเศษ' })).toBeNull()
   })
 })

@@ -67,6 +67,18 @@ export const api = {
     }
     return res.json()
   },
+  // FR-EQP-06, ASM-02, Q-04: เจ้าหน้าที่ปลดล็อก (override) เป็นกรณีพิเศษ เมื่อนักศึกษามีรายการค้างคืน
+  async overrideLoanRequest(requestId) {
+    const res = await fetch(`${BASE}/loan-requests/${encodeURIComponent(requestId)}/override`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({}),
+    })
+    if (!res.ok) {
+      throw new Error(`Override failed: ${res.status}`)
+    }
+    return res.json()
+  },
   async getSlots({ dateFrom, packageCode }) {
     const q = new URLSearchParams({ date_from: dateFrom, package_code: packageCode })
     const res = await fetch(`${BASE}/slots?${q}`)

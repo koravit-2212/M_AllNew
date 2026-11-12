@@ -7,6 +7,7 @@ from app.services.equipment_service import (
     InsufficientStock,
     RequestNotFound,
     RequestNotPending,
+    StudentBlocked,
     StudentNotFound,
     approve_request,
     create_loan_request,
@@ -110,17 +111,14 @@ class ApproveIn(BaseModel):
     approver_id: str = ''
 
 
-@router.post('/loan-requests/{request_id}/approve')
-def approve_loan_request_endpoint(
-    request_id: str,
-    body: ApproveIn | None = None,
-    store: EquipmentStore = Depends(get_equipment_store),
-) -> dict:
-    """FR-EQP-03, FR-EQP-04: เจ้าหน้าที่อนุมัติ บันทึกการยืม และคืนจำนวนคงเหลือใหม่กับ due date"""
+def _approve(store: EquipmentStore, request_id: str, body: ApproveIn | None, override: bool) -> dict:
+    """FR-EQP-04, FR-EQP-06, ASM-02: อนุมัติแบบปกติหรือแบบ override แล้วแปลงผลเป็น response"""
 
     approver_id = body.approver_id if body else ''
     try:
-        loan = approve_request(store, request_id, approver_id)
+        loan = approve_request(store, request_id, approver_id, override=override)
+    except StudentBlocked:
+        raise HTTPException(status_code=409, detail='มีรายการค้างคืน')
     except RequestNotFound:
         raise HTTPException(status_code=404, detail='Loan request not found')
     except RequestNotPending:
@@ -138,4 +136,27 @@ def approve_loan_request_endpoint(
         'quantity': loan.quantity,
         'available_count': equipment.available_count,
         'due_date': loan.due_date.isoformat() if loan.due_date else None,
+        'override': override,
     }
+
+
+@router.post('/loan-requests/{request_id}/approve')
+def approve_loan_request_endpoint(
+    request_id: str,
+    body: ApproveIn | None = None,
+    store: EquipmentStore = Depends(get_equipment_store),
+) -> dict:
+    """FR-EQP-03, FR-EQP-04, ASM-02: เจ้าหน้าที่อนุมัติปกติ บล็อกถ้านักศึกษามีรายการค้างคืน (409)"""
+
+    return _approve(store, request_id, body, override=False)
+
+
+@router.post('/loan-requests/{request_id}/override')
+def override_loan_request_endpoint(
+    request_id: str,
+    body: ApproveIn | None = None,
+    store: EquipmentStore = Depends(get_equipment_store),
+) -> dict:
+    """FR-EQP-06, ASM-02, Q-04: เจ้าหน้าที่ปลดล็อกเป็นกรณีพิเศษ ไม่บังคับเหตุผล ทุกคนกดได้ (ยังไม่มีล็อกอิน Q-05)"""
+
+    return _approve(store, request_id, body, override=True)

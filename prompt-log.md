@@ -957,3 +957,13 @@
 - ผล test: หลังบ้าน 24 passed, หน้าจอ 15 passed
 - `EQUIPMENT_LOAN_DAYS` ใน config ทุกประเภท 1 วัน (Q-03) นับวันตาม `LIBRARY_TIMEZONE = 'Asia/Bangkok'` อ้าง glossary
 - หน้าเจ้าหน้าที่แสดง "กำหนดคืน (due date)" ก่อนอนุมัติ และ "กำหนดคืน" หลังอนุมัติ ตาม UI-EQP-02 รูปแบบวันที่จาก th-TH เช่น "ศ. 13 พ.ย. 2569" (mockup ไม่มีจุดหลังตัวย่อวัน)
+
+## 2026-11-12 คำสั่ง: /implement-all 007-equipment เฟสรอคำตอบ — T-14
+
+- task: T-14 บล็อกการยืมเมื่อมีรายการค้างคืน และให้เจ้าหน้าที่ปลดล็อก (override)
+- ไฟล์ที่แตะ: `backend/app/services/equipment_service.py`, `backend/app/api/equipment.py`, `frontend/src/api/client.js`, `frontend/src/pages/StaffLoanApprovalPage.jsx`, `frontend/src/__tests__/StaffLoanApprovalPage.test.jsx`, `backend/tests/test_AC_EQP_04_block_and_override.py`
+- ผล test: หลังบ้าน 27 passed, หน้าจอ 17 passed
+- POST /approve ตอบ 409 "มีรายการค้างคืน" เมื่อนักศึกษามีรายการค้างคืน เพิ่ม POST /api/loan-requests/{id}/override (plan.md ข้อ 4) ไม่บังคับเหตุผล (Q-04)
+- นักศึกษาที่มีรายการค้างคืนยังส่งคำขอได้ เพื่อให้เจ้าหน้าที่ตรวจตาม AC-EQP-04 การบล็อกอยู่ที่ขั้นอนุมัติตามคำตอบ Q-04
+- หน้าเจ้าหน้าที่: เพิ่มประโยค "ระบบบล็อกการยืมใหม่จนกว่าจะคืนและชำระค่าปรับ" ซ่อนปุ่ม "อนุมัติการยืม" แสดงปุ่ม "ปลดล็อก (override) เป็นกรณีพิเศษ" ตาม UI-EQP-02
+- ไม่ทำ audit_log / override_by ใน plan.md เพราะ Q-04 ไม่บังคับเหตุผลและยังไม่มีล็อกอิน (Q-05)

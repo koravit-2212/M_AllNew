@@ -4,7 +4,8 @@ import { api } from '../api/client.js'
 
 // FR-EQP-03, FR-EQP-04, FR-EQP-06, NFR-USB-01
 // หน้าเจ้าหน้าที่ตรวจสอบและอนุมัติคำขอยืมอุปกรณ์ (UI-EQP-02)
-// FR-EQP-04 (Q-03): แสดงกำหนดคืนก่อนและหลังอนุมัติ ส่วนการบล็อกและปุ่ม override (ASM-02) อยู่ใน T-14
+// FR-EQP-04 (Q-03): แสดงกำหนดคืนก่อนและหลังอนุมัติ
+// FR-EQP-06, ASM-02 (Q-04): นักศึกษามีรายการค้างคืน ปุ่มอนุมัติปกติถูกบล็อก เหลือปุ่ม override
 
 function Row({ label, children }) {
   return (
@@ -54,12 +55,14 @@ export default function StaffLoanApprovalPage({ client = api }) {
 
   const selected = requests.find((request) => request.request_id === selectedId)
 
-  // FR-EQP-04: อนุมัติ แล้วแสดงว่าบันทึกการยืมแล้ว พร้อมจำนวนคงเหลือใหม่
-  const approve = async () => {
+  // FR-EQP-04: อนุมัติ (หรือ override ตาม ASM-02) แล้วแสดงว่าบันทึกการยืมแล้ว พร้อมจำนวนคงเหลือใหม่
+  const approve = async (override = false) => {
     if (!selected) return
     setApproving(true)
     try {
-      const loan = await client.approveLoanRequest(selected.request_id)
+      const loan = override
+        ? await client.overrideLoanRequest(selected.request_id)
+        : await client.approveLoanRequest(selected.request_id)
       setResult({ name: loan.equipment_name, availableCount: loan.available_count, dueDate: loan.due_date })
       setSelectedId(null)
       await loadRequests()
@@ -136,16 +139,28 @@ export default function StaffLoanApprovalPage({ client = api }) {
                     <li key={`${item.item}-${index}`}>{formatOutstanding(item)}</li>
                   ))}
                 </ul>
+                <p>ระบบบล็อกการยืมใหม่จนกว่าจะคืนและชำระค่าปรับ</p>
               </div>
             )}
-            <button
-              type="button"
-              onClick={approve}
-              disabled={approving}
-              className="mt-4 w-full rounded-xl bg-teal-700 px-4 py-3 font-bold text-white disabled:bg-slate-300"
-            >
-              อนุมัติการยืม
-            </button>
+            {selected.outstanding_items.length > 0 ? (
+              <button
+                type="button"
+                onClick={() => approve(true)}
+                disabled={approving}
+                className="mt-4 w-full rounded-xl border border-teal-700 bg-white px-4 py-3 font-bold text-teal-700 disabled:opacity-50"
+              >
+                ปลดล็อก (override) เป็นกรณีพิเศษ
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => approve(false)}
+                disabled={approving}
+                className="mt-4 w-full rounded-xl bg-teal-700 px-4 py-3 font-bold text-white disabled:bg-slate-300"
+              >
+                อนุมัติการยืม
+              </button>
+            )}
           </div>
         )}
       </section>
