@@ -823,3 +823,9 @@
 - ผลลัพธ์: สร้าง `specs/004-reserve/tasks.md` 5 เฟส 9 task ไม่มี task รอ Q-xx
 - ข้อเสนอคำถามให้ทีม: (1) ที่มาของ user_id สำหรับ CON-ELG-01 (2) ASM-02 ไม่มี FR รองรับ (3) ASM-03/ASM-04 ไม่มี FR รองรับ
 - ทางเทคนิค: ใช้ข้อมูลในหน่วยความจำแบบเดียวกับ 003 แทน PostgreSQL (ทีมเลือกเอง ไม่ได้มาจาก spec) และ spec ไม่มีหมวด "หน้าจอ (UI)"
+
+## 2026-11-12 คำสั่ง: /implement-all specs/004-reserve/tasks.md เฟส 0 — T-01
+
+- task: T-01 สร้างข้อมูลพื้นที่และช่วงเวลาตัวอย่าง พร้อมที่เก็บการจอง
+- ไฟล์ที่แตะ: `backend/app/config.py`, `backend/app/models/space.py`, `backend/tests/test_BKG_T01_space_store.py`
+- ผล test: หลังบ้าน 10 passed, หน้าจอ 7 passed
