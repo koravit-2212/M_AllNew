@@ -864,3 +864,7 @@
   - ไฟล์ที่แตะ: `backend/tests/test_AC_BKG_03_unavailable_space_rejected.py` (โค้ดใน service / api ทำไว้แล้วตอน T-05 เพราะเป็นส่วนหนึ่งของการตรวจความว่างแบบ atomic)
   - ผล test: หลังบ้าน 17 passed
   - 409 "พื้นที่ไม่ว่างในช่วงเวลานี้" (ข้อความจาก UI-BKG-01) และ check-availability ตอบ available=false
+- T-08 แสดงสถานะ "พื้นที่ไม่ว่าง" และปุ่มกลับไปเลือกใหม่
+  - ไฟล์ที่แตะ: `frontend/src/pages/SpaceBookingPage.jsx`, `frontend/src/__tests__/SpaceBookingPage.test.jsx`
+  - ผล test: หลังบ้าน 17 passed, หน้าจอ 13 passed
+  - ข้อความตาม UI-BKG-01: "พื้นที่ไม่ว่างในช่วงเวลานี้", "กรุณาเลือกพื้นที่หรือเวลาอื่น ระบบไม่ได้สร้างรายการจองซ้อน", การ์ด พื้นที่ / เวลา, "กลับไปเลือกพื้นที่/เวลาใหม่" (โหลดสถานะว่างใหม่)

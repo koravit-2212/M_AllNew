@@ -4,7 +4,7 @@ import { api } from '../api/client.js'
 
 // FR-BKG-01, FR-BKG-03, NFR-USB-01
 // หน้าจองพื้นที่ในห้องสมุด (UI-BKG-01) ขั้น 1 เลือกพื้นที่และช่วงเวลา ขั้น 2 ยืนยัน ขั้น 3 ผลการจอง
-// สถานะพื้นที่ไม่ว่างเพิ่มใน T-08
+// FR-BKG-04: พื้นที่ไม่ว่าง (409) แจ้งให้เลือกพื้นที่หรือเวลาอื่น และกลับไปเลือกใหม่ได้
 
 const STEPS = ['1 เลือกพื้นที่', '2 ยืนยัน', '3 ผลการจอง']
 
@@ -82,7 +82,7 @@ export default function SpaceBookingPage({ client = api }) {
   // step: 'select' | 'confirm' | 'done'
   const [step, setStep] = useState('select')
   const [booked, setBooked] = useState(null)
-  // null | 'not_eligible' (403, CON-ELG-01) | 'failed' (Q-04)
+  // null | 'unavailable' (409, FR-BKG-04) | 'not_eligible' (403, CON-ELG-01) | 'failed' (Q-04)
   const [error, setError] = useState(null)
   const [submitting, setSubmitting] = useState(false)
   const [reloadKey, setReloadKey] = useState(0)
@@ -142,7 +142,8 @@ export default function SpaceBookingPage({ client = api }) {
       setBooked({ space: selectedSpace, slot: selectedSlot })
       setStep('done')
     } catch (err) {
-      setError(err?.status === 403 ? 'not_eligible' : 'failed')
+      if (err?.status === 409) setError('unavailable')
+      else setError(err?.status === 403 ? 'not_eligible' : 'failed')
     } finally {
       setSubmitting(false)
     }
@@ -165,6 +166,29 @@ export default function SpaceBookingPage({ client = api }) {
             className="mt-4 w-full rounded-xl border border-teal-700 bg-white px-4 py-3 font-bold text-teal-700"
           >
             กลับหน้าหลัก
+          </button>
+        </section>
+      </main>
+    )
+  }
+
+  if (step === 'confirm' && selectedSpace && selectedSlot && error === 'unavailable') {
+    return (
+      <main className="mx-auto max-w-4xl p-4 md:p-8">
+        <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm md:p-8">
+          <h1 className="text-2xl font-bold text-slate-800">จองพื้นที่ในห้องสมุด</h1>
+          <Steps current={1} />
+          <div className="mt-4 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800" role="alert">
+            <b className="block text-base">พื้นที่ไม่ว่างในช่วงเวลานี้</b>
+            กรุณาเลือกพื้นที่หรือเวลาอื่น ระบบไม่ได้สร้างรายการจองซ้อน
+          </div>
+          <SummaryCard space={selectedSpace} slot={selectedSlot} withDate={false} />
+          <button
+            type="button"
+            onClick={backToSelect}
+            className="mt-4 w-full rounded-xl bg-teal-700 px-4 py-3 font-bold text-white"
+          >
+            กลับไปเลือกพื้นที่/เวลาใหม่
           </button>
         </section>
       </main>

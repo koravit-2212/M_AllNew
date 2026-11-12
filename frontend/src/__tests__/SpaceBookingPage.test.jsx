@@ -1,5 +1,6 @@
 // T-04 (FR-BKG-01, NFR-USB-01) ตรวจด้วย AC-BKG-01
 // T-06 (FR-BKG-03, NFR-USB-01) ตรวจด้วย AC-BKG-02
+// T-08 (FR-BKG-04, NFR-USB-01) ตรวจด้วย AC-BKG-03
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { vi } from 'vitest'
 
@@ -116,5 +117,24 @@ describe('AC-BKG-02 จองสำเร็จ', () => {
     fireEvent.click(screen.getByRole('button', { name: 'ยืนยันการจอง' }))
     expect(await screen.findByText('จองไม่สำเร็จ กรุณาลองใหม่')).toBeTruthy()
     expect(screen.getByRole('button', { name: 'ยืนยันการจอง' })).toBeTruthy()
+  })
+})
+
+describe('AC-BKG-03 พื้นที่ไม่ว่าง', () => {
+  it('AC-BKG-03 ยืนยันแล้วหลังบ้านตอบ 409 เห็นพื้นที่ไม่ว่างในช่วงเวลานี้ และกลับไปเลือกใหม่ได้', async () => {
+    // Given พื้นที่ที่เลือกไม่ว่างในช่วงเวลานั้น (มีคนจองไปก่อน)
+    const client = makeClient(vi.fn().mockRejectedValue(Object.assign(new Error('Reservation failed: 409'), { status: 409 })))
+    await goToConfirm(client)
+
+    // When นักศึกษาพยายามจอง
+    fireEvent.click(screen.getByRole('button', { name: 'ยืนยันการจอง' }))
+
+    // Then ระบบแจ้งให้เลือกพื้นที่หรือเวลาอื่น
+    expect(await screen.findByText('พื้นที่ไม่ว่างในช่วงเวลานี้')).toBeTruthy()
+    expect(screen.getByText(/กรุณาเลือกพื้นที่หรือเวลาอื่น/)).toBeTruthy()
+    expect(screen.queryByText('จองสำเร็จ')).toBeNull()
+    fireEvent.click(screen.getByRole('button', { name: 'กลับไปเลือกพื้นที่/เวลาใหม่' }))
+    expect(await screen.findByText('พื้นที่ที่ใช้งานได้')).toBeTruthy()
+    await waitFor(() => expect(client.listAvailableSpaces).toHaveBeenCalledTimes(2))
   })
 })
