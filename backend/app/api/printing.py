@@ -8,10 +8,12 @@ from app.services.printing_service import (
     allowed_color_modes,
     calculate_cost,
     get_file,
+    job_payload,
     register_file,
+    submit_print_job,
 )
 
-# FR-PRT-01, FR-PRT-02
+# FR-PRT-01, FR-PRT-02, FR-PRT-03, IF-PRN-01
 # Route ของบริการปริ้นเอกสาร เก็บข้อมูลในหน่วยความจำแบบเดียวกับ 003 (ทีมเลือกเอง ไม่ได้มาจาก spec)
 
 router = APIRouter(prefix='/api')
@@ -66,3 +68,33 @@ def print_options(
         'allowed_color_modes': allowed_color_modes(),
         **cost,
     }
+
+
+class SubmitIn(BaseModel):
+    file_id: str
+    pages: int = Field(ge=1)
+    copies: int = Field(ge=1)
+    color_mode: str = 'BW'
+
+
+@router.post('/print/submit', status_code=201)
+def submit_print(body: SubmitIn, store: PrintStore = Depends(get_print_store)) -> dict:
+    """FR-PRT-03, IF-PRN-01: ยืนยันการพิมพ์ ส่งงานไป spooler และบันทึกการใช้บริการ"""
+
+    try:
+        job = submit_print_job(store, body.file_id, body.pages, body.copies, body.color_mode)
+    except FileNotFound:
+        raise HTTPException(status_code=404, detail='File not found')
+    except InvalidColorMode:
+        raise HTTPException(status_code=422, detail='Invalid color mode')
+    return job_payload(store, job)
+
+
+@router.get('/print/jobs/{printjob_id}')
+def get_print_job(printjob_id: str, store: PrintStore = Depends(get_print_store)) -> dict:
+    """FR-PRT-03: อ่านงานพิมพ์ที่บันทึกไว้"""
+
+    job = store.jobs.get(printjob_id)
+    if job is None:
+        raise HTTPException(status_code=404, detail='Print job not found')
+    return job_payload(store, job)

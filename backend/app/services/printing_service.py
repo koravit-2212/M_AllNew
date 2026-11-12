@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 from app.config import PRINT_RATE_PER_PAGE_BAHT
-from app.models.printing import PrintFile, PrintStore
+from app.models.printing import PrintFile, PrintJob, PrintStore
 
-# FR-PRT-01, FR-PRT-02
+# FR-PRT-01, FR-PRT-02, FR-PRT-03, IF-PRN-01
 # กฎของบริการปริ้นเอกสาร แยกจาก route เพื่อให้ test เรียกได้ตรง ๆ
 
 # ชื่อชนิดการพิมพ์ที่แสดงบนหน้าจอ (ข้อความจาก UI-PRT-01) อัตราอยู่ใน config (ASM-03)
@@ -47,3 +47,51 @@ def get_file(store: PrintStore, file_id: str) -> PrintFile:
     if record is None:
         raise FileNotFound(file_id)
     return record
+
+
+def ready_printer(store: PrintStore):
+    """FR-PRT-05, IF-PRN-01: เครื่องพิมพ์ตัวแรกที่พร้อมใช้งาน (ไม่มีคืน None)"""
+
+    return next((printer for printer in store.printers if printer.is_ready), None)
+
+
+def submit_print_job(store: PrintStore, file_id: str, pages: int, copies: int, color_mode: str, user_id: str = '') -> PrintJob:
+    """FR-PRT-03, IF-PRN-01: ส่งงานไปยังเครื่องปริ้นผ่าน spooler และบันทึกข้อมูลการใช้บริการ
+    Q-08: ยังไม่มีล็อกอิน user_id เป็นค่าว่าง
+    """
+
+    get_file(store, file_id)
+    cost = calculate_cost(pages, copies, color_mode)
+    printer = ready_printer(store)
+    job = PrintJob(
+        printjob_id=f'JOB-{len(store.jobs) + 1:04d}',
+        user_id=user_id,
+        file_id=file_id,
+        pages_requested=pages,
+        copies=copies,
+        color_mode=color_mode,
+        total_cost=cost['estimated_cost'],
+        status='sent',
+        printer_id=printer.printer_id if printer else '',
+    )
+    store.spooler.send(job.printer_id, job)
+    store.jobs[job.printjob_id] = job
+    return job
+
+
+def job_payload(store: PrintStore, job: PrintJob) -> dict:
+    """FR-PRT-03: ข้อมูลงานพิมพ์ที่บันทึกไว้"""
+
+    record = store.files.get(job.file_id)
+    return {
+        'printjob_id': job.printjob_id,
+        'status': job.status,
+        'file_id': job.file_id,
+        'filename': record.filename if record else '',
+        'pages': job.pages_requested,
+        'copies': job.copies,
+        'total_pages': job.pages_requested * job.copies,
+        'color_mode': job.color_mode,
+        'total_cost': job.total_cost,
+        'printer_id': job.printer_id,
+    }
