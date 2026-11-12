@@ -1184,3 +1184,11 @@
 - ตารางไปข้างหน้า 8 แถว: ครบ 3 (FR-PRT-01, 02, 05), ช่องโหว่ 5 (FR-PRT-03 / IF-PRN-01 จาก F-02, FR-PRT-04 / CON-FILE-01 จาก F-06, NFR-USB-01 จาก F-01)
 - ข้อค้นพบ 7 ข้อ แก้ด้วยเอกสารทันที 4 ข้อ (F-03, F-04, F-05 แก้ plan ข้อ 4 + ตาราง "ค่าที่ตั้งได้", F-07 แก้ข้อความจุดตรวจเฟส 3 ใน tasks.md) ยังเปิด 3 ข้อ (F-02, F-06 ผูกกับ Q-07 spooler / เนื้อไฟล์จริง, F-01 มือถือ)
 - ช่อง "ทีมตัดสิน" AI เขียนแทนตามคำสั่ง "ตัดสินใจเองทั้งหมดได้เลย"
+
+## 2026-11-12 คำสั่ง: "ทำเลย" → merge 004-reserve, 006-printing, 007-equipment เข้า main
+
+- ทำบน branch `integrate-004-006-007` (แตกจาก main) merge 007 → 004 → 006 แล้ว fast-forward main ในเครื่อง
+- แก้จุดชน: `backend/app/config.py`, `backend/app/main.py`, `frontend/src/api/client.js` รวมของทุกฟีเจอร์ (client.js ประกอบใหม่จากของแต่ละ branch เพราะ union ตัดฟังก์ชันขาดกลาง), `frontend/src/App.jsx` รวมเมนู หนังสือ / จองพื้นที่ / ปริ้นเอกสาร / ยืมอุปกรณ์ / อนุมัติยืมอุปกรณ์ (เจ้าหน้าที่), `App.test.jsx` เขียนใหม่ให้ตรวจทุกเมนู, `prompt-log.md` และ `specs/CHANGELOG.md` เก็บบันทึกของทุก branch ครบ (ลำดับตามการ merge ไม่ใช่ตามเวลา)
+- เลิก track ไฟล์ `__pycache__/*.pyc` ทั้งหมด และเพิ่ม `__pycache__/`, `*.pyc`, `.pytest_cache/` ใน `.gitignore`
+- ผล test หลังรวม: หลังบ้าน 93 passed, หน้าจอ 54 passed
+- ยังไม่ push (AI push ไม่ได้ ทีมต้องสั่งเอง)
