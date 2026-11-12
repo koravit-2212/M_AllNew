@@ -868,3 +868,9 @@
   - ไฟล์ที่แตะ: `frontend/src/pages/SpaceBookingPage.jsx`, `frontend/src/__tests__/SpaceBookingPage.test.jsx`
   - ผล test: หลังบ้าน 17 passed, หน้าจอ 13 passed
   - ข้อความตาม UI-BKG-01: "พื้นที่ไม่ว่างในช่วงเวลานี้", "กรุณาเลือกพื้นที่หรือเวลาอื่น ระบบไม่ได้สร้างรายการจองซ้อน", การ์ด พื้นที่ / เวลา, "กลับไปเลือกพื้นที่/เวลาใหม่" (โหลดสถานะว่างใหม่)
+- T-09 ทดสอบผู้ใช้ 2 คนยืนยันพร้อมกัน
+  - ไฟล์ที่แตะ: `backend/tests/test_AC_BKG_04_concurrent_booking_prevented.py`
+  - ผล test: หลังบ้าน 20 passed, หน้าจอ 13 passed
+  - ใช้ thread + barrier เรียก service ตรง (TestClient ทำให้คำขอเรียงคิวกัน จึงไม่เกิดการแย่งจริง) และหน่วงเวลาระหว่าง "ตรวจว่าง" กับ "บันทึก"
+  - ตรวจว่า test จับได้จริง: ลองเอา `with store.lock` ออกชั่วคราว test ไม่ผ่าน 2 ตัว แล้วใส่กลับ (ไม่ได้ commit การลองนี้)
+- หมายเหตุ: repo track ไฟล์ `__pycache__/*.pyc` ไว้ตั้งแต่ก่อน (มีใน main) ตั้งแต่ตอนนี้ AI ไม่ commit ไฟล์ .pyc เพิ่ม ทีมควรเพิ่ม `__pycache__/` ใน .gitignore และลบออกจาก repo
