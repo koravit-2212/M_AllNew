@@ -2,9 +2,9 @@ import { useCallback, useEffect, useState } from 'react'
 
 import { api } from '../api/client.js'
 
-// FR-EQP-03, FR-EQP-04, NFR-USB-01
+// FR-EQP-03, FR-EQP-04, FR-EQP-06, NFR-USB-01
 // หน้าเจ้าหน้าที่ตรวจสอบและอนุมัติคำขอยืมอุปกรณ์ (UI-EQP-02)
-// ช่อง "กำหนดคืน (due date)" อยู่ใน T-13 และคำเตือนรายการค้างคืนอยู่ใน T-12
+// ช่อง "กำหนดคืน (due date)" อยู่ใน T-13 ส่วนการบล็อกและปุ่ม override (ASM-02) อยู่ใน T-14 รอคำตอบทีม
 
 function Row({ label, children }) {
   return (
@@ -13,6 +13,11 @@ function Row({ label, children }) {
       <span className="text-right">{children}</span>
     </div>
   )
+}
+
+// FR-EQP-06: ข้อความรายการค้างคืนแต่ละรายการ ตาม UI-EQP-02 เช่น "ร่ม — เกินกำหนด 2 วัน"
+function formatOutstanding(item) {
+  return `${item.item} — เกินกำหนด ${item.days_overdue} วัน`
 }
 
 export default function StaffLoanApprovalPage({ client = api }) {
@@ -101,6 +106,16 @@ export default function StaffLoanApprovalPage({ client = api }) {
               </Row>
               {selected.outstanding_items.length === 0 && <Row label="รายการค้างคืน">ไม่มี</Row>}
             </div>
+            {selected.outstanding_items.length > 0 && (
+              <div className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900" role="alert">
+                <b className="block text-base">มีรายการค้างคืน</b>
+                <ul>
+                  {selected.outstanding_items.map((item, index) => (
+                    <li key={`${item.item}-${index}`}>{formatOutstanding(item)}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
             <button
               type="button"
               onClick={approve}

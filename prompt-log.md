@@ -924,3 +924,12 @@
 - ไฟล์ที่แตะ: `backend/app/services/equipment_service.py`, `backend/app/api/equipment.py`, `backend/tests/test_AC_EQP_04_outstanding_shown.py` (และ `tasks.md`, `prompt-log.md`)
 - ผล test: หลังบ้าน 21 passed, หน้าจอ 12 passed
 - เพิ่มฟิลด์ `has_outstanding` ในรายละเอียดคำขอ คำขอของนักศึกษาที่มีรายการค้างคืนยังเป็น pending ให้เจ้าหน้าที่ตัดสิน ยังไม่บล็อกตาม ASM-02 (T-14 รอคำตอบ)
+
+## 2026-11-12 คำสั่ง: /implement-all 007-equipment เฟส 4 — T-12
+
+- task: T-12 แสดงคำเตือน "มีรายการค้างคืน" ในหน้าเจ้าหน้าที่
+- ไฟล์ที่แตะ: `frontend/src/pages/StaffLoanApprovalPage.jsx`, `frontend/src/__tests__/StaffLoanApprovalPage.test.jsx` (และ `tasks.md`, `prompt-log.md`)
+- ผล test: หลังบ้าน 21 passed, หน้าจอ 14 passed
+- ข้อความตาม UI-EQP-02 สถานะมีรายการค้างคืน: "มีรายการค้างคืน" และ "<รายการ> — เกินกำหนด N วัน"
+- ไม่ใส่ประโยค "ระบบบล็อกการยืมใหม่จนกว่าจะคืนและชำระค่าปรับ" และปุ่ม "ปลดล็อก (override) เป็นกรณีพิเศษ" เพราะเป็นเรื่อง ASM-02 ที่ยังรอคำตอบ (T-14)
+- ยังแสดงปุ่ม "อนุมัติการยืม" ให้เจ้าหน้าที่ตัดสินเองตาม FR-EQP-06 จนกว่าทีมจะตอบข้อเสนอคำถามข้อ 2

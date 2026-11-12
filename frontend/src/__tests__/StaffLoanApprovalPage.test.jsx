@@ -1,4 +1,5 @@
 // T-08 (FR-EQP-03, FR-EQP-04, NFR-USB-01) ตรวจด้วย AC-EQP-02
+// T-12 (FR-EQP-06, NFR-USB-01) ตรวจด้วย AC-EQP-04
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { vi } from 'vitest'
 
@@ -48,5 +49,50 @@ describe('AC-EQP-02 เจ้าหน้าที่อนุมัติ ร�
     expect(await screen.findByText('บันทึกการยืมแล้ว')).toBeTruthy()
     expect(screen.getByText('อุปกรณ์ทดสอบคงเหลือ 2')).toBeTruthy()
     expect(screen.queryByRole('button', { name: /นักศึกษาทดสอบ 1/ })).toBeNull()
+  })
+})
+
+describe('AC-EQP-04 นักศึกษามีรายการค้างคืน เจ้าหน้าที่ต้องตรวจก่อน', () => {
+  it('AC-EQP-04 เห็นคำเตือนมีรายการค้างคืน พร้อมรายการที่ค้าง', async () => {
+    // Given นักศึกษามีรายการค้างคืนอุปกรณ์หรือหนังสือ
+    // When นักศึกษาขอยืมอุปกรณ์เพิ่ม (มีคำขอรอเจ้าหน้าที่)
+    const client = {
+      listPendingLoanRequests: vi.fn().mockResolvedValue({
+        items: [
+          {
+            ...PENDING,
+            request_id: 'REQ-0002',
+            student: { student_id: 'S2', name: 'นักศึกษาทดสอบ 2' },
+            has_outstanding: true,
+            outstanding_items: [
+              { item: 'ของค้าง 1', days_overdue: 2 },
+              { item: 'ของค้าง 2', days_overdue: 5 },
+            ],
+          },
+        ],
+      }),
+      approveLoanRequest: vi.fn(),
+    }
+    render(<StaffLoanApprovalPage client={client} />)
+    fireEvent.click(await screen.findByRole('button', { name: /นักศึกษาทดสอบ 2/ }))
+
+    // Then เจ้าหน้าที่ต้องตรวจสอบรายการค้างคืนก่อนตัดสินใจอนุมัติ
+    const alert = within(screen.getByRole('alert'))
+    expect(alert.getByText('มีรายการค้างคืน')).toBeTruthy()
+    expect(alert.getByText('ของค้าง 1 — เกินกำหนด 2 วัน')).toBeTruthy()
+    expect(alert.getByText('ของค้าง 2 — เกินกำหนด 5 วัน')).toBeTruthy()
+    expect(within(screen.getByLabelText('ข้อมูลคำขอ')).queryByText('ไม่มี')).toBeNull()
+    expect(client.approveLoanRequest).not.toHaveBeenCalled()
+  })
+
+  it('AC-EQP-04 นักศึกษาไม่มีรายการค้างคืน ไม่เห็นคำเตือน', async () => {
+    const client = {
+      listPendingLoanRequests: vi.fn().mockResolvedValue({ items: [PENDING] }),
+      approveLoanRequest: vi.fn(),
+    }
+    render(<StaffLoanApprovalPage client={client} />)
+    fireEvent.click(await screen.findByRole('button', { name: /นักศึกษาทดสอบ 1/ }))
+
+    expect(screen.queryByText('มีรายการค้างคืน')).toBeNull()
   })
 })
