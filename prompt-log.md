@@ -829,3 +829,11 @@
 - task: T-01 สร้างข้อมูลพื้นที่และช่วงเวลาตัวอย่าง พร้อมที่เก็บการจอง
 - ไฟล์ที่แตะ: `backend/app/config.py`, `backend/app/models/space.py`, `backend/tests/test_BKG_T01_space_store.py`
 - ผล test: หลังบ้าน 10 passed, หน้าจอ 7 passed
+
+## 2026-11-12 คำสั่ง: /implement-all specs/004-reserve/tasks.md เฟส 0 — T-02
+
+- task: T-02 เพิ่มเมนูไปหน้าจองพื้นที่ใน App.jsx โดยไม่ลบหน้าเดิม
+- ไฟล์ที่แตะ: `frontend/src/App.jsx`, `frontend/src/pages/SpaceBookingPage.jsx`, `frontend/src/__tests__/App.test.jsx`
+- ผล test: หลังบ้าน 10 passed, หน้าจอ 8 passed
+- แก้ tasks.md: ชื่อเมนูหน้าเดิมเปลี่ยนจาก "ค้นหาหนังสือ" เป็น "หนังสือ" เพราะ test เดิม `setup.test.jsx` หาข้อความ "ค้นหาหนังสือ" แบบมีได้ตัวเดียว ถ้าเมนูใช้คำเดียวกัน test เดิมจะพัง
+- App.jsx จัดเมนูเป็นอาร์เรย์ MENUS เพื่อให้ 006 และ 007 เพิ่มเมนูคนละแถว
