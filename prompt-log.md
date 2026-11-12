@@ -845,3 +845,8 @@
   - ไฟล์ที่แตะ: `backend/app/services/printing_service.py`, `backend/app/api/printing.py`, `backend/app/main.py`, `backend/tests/test_AC_PRT_01_cost_preview.py`
   - ผล test: หลังบ้าน 12 passed, หน้าจอ 8 passed
   - POST /api/print/upload รับ JSON (filename, content_type, size_bytes) แทน multipart ตาม Q-07 / GET /api/print/options คืน total_pages, estimated_cost, allowed_color_modes
+- T-04 ทำหน้าเลือกไฟล์ ชนิดการพิมพ์ จำนวนหน้า จำนวนชุด และแสดงค่าใช้บริการ
+  - ไฟล์ที่แตะ: `frontend/src/api/client.js`, `frontend/src/pages/PrintPage.jsx`, `frontend/src/__tests__/PrintPage.test.jsx`
+  - ผล test: หลังบ้าน 12 passed, หน้าจอ 9 passed
+  - ข้อความตาม UI-PRT-01: ขั้น "1 เลือกไฟล์ / 2 ยืนยัน / 3 ผล", "ไฟล์", "<ชื่อ> (1.2 MB)", "ชนิดการพิมพ์" ขาว-ดำ / สี, "จำนวนหน้า", "จำนวนชุด", "คำนวณ: 12 หน้า × 2 ชุด = 24 หน้า", "ค่าใช้บริการ: 24 บาท"
+  - ไม่ใส่ข้อความ "หักจากโควตาฟรี 100 บาท/เทอม" ใน mockup ตาม Q-04
