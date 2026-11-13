@@ -4,6 +4,7 @@ from app.api.access import router as access_router
 from app.api.books import router as books_router
 from app.api.equipment import router as equipment_router
 from app.api.health import router as health_router
+from app.api.loans import router as loans_router
 from app.api.reservations import router as reservations_router
 from app.api.printing import router as printing_router
 from app.api.search import router as search_router
@@ -18,6 +19,8 @@ app.include_router(health_router)
 app.include_router(search_router)
 app.include_router(books_router)
 app.include_router(equipment_router)
+# FR-LNS-01 route ของการยืม-คืนหนังสือ (005-borrow-return)
+app.include_router(loans_router)
 # FR-ACC-01 route ของการยืนยันตัวตนที่ประตูทางเข้า (001-access)
 app.include_router(access_router)
 # FR-BKG-01 route ของการจองพื้นที่ (004-reserve)

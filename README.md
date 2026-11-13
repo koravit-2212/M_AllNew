@@ -9,3 +9,10 @@
 007-equipment >> จัดทำโดย 670710216 กมลชนก ยันแปว
 
 001-access >> จัดทำโดย 670710741 ศิวกร แซ่เจว
+
+005-borrow-return >> จัดทำโดย 670710209 ฟ้าใส คำพาลักษณ์
+
+เปิดระบบ: 
+หลังบ้าน `cd backend && uvicorn app.main:app --reload --port 8000` 
+
+หน้าจอ `cd frontend && npm run dev`

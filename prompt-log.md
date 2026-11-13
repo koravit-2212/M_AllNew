@@ -198,9 +198,130 @@
   - `cd /workspaces/M_AllNew/backend && pytest tests/test_T02_access_seed_data.py tests/test_T04_access_scan_success.py tests/test_T06_access_denied_manual_verification.py tests/test_T08_access_unreadable_scan.py -q` → ผ่าน 5/5
 - ข้อจำกัด/การคาดเดา:
   - จำกัดเฉพาะ unreadable scan flow ตาม T-08 เท่านั้น ไม่ขยายไปถึง UI T-09 หรือ denial logic ข้างต้น
+
+## 2026-11-13 00:15 คำสั่ง: /implement T-03 specs/005-borrow-return/tasks.md
+
+- เครื่องมือ: Copilot ใน Codespaces
+- โหมด: implement
+- ไฟล์: `backend/app/api/loans.py`, `backend/app/main.py`, `backend/app/services/member_profile_seed.py`
+- ผลลัพธ์: เพิ่ม route shell สำหรับ `POST /api/loans/borrow`, `POST /api/loans/return`, `GET /api/loans/history/{member_id}` และเพิ่ม seed data สำหรับสมาชิกยืม-คืนเพื่อรองรับการทดสอบ/พัฒนาต่อใน T-04/T-06/T-08
+- การทดสอบ:
+  - `cd /workspaces/M_AllNew/backend && pytest tests/test_LNS_T01_loan_schema.py tests/test_LNS_T02_loan_validation.py -q` → ผ่าน 2/2
+  - `python` snippet โดยใช้ `TestClient(app)` ตรวจ `/api/loans/borrow`, `/api/loans/return`, `/api/loans/history/STD-1001` → ทุก endpoint คืน `200` และ payload มีรูปแบบที่พร้อมสำหรับ task ถัดไป
+- ข้อจำกัด/การคาดเดา:
+  - จำกัดเฉพาะ route shell และ seed data ตาม T-03 เท่านั้น ไม่ขยายไปสู่ business logic ที่ให้ T-04/T-06 รับผิดชอบ
+- สรุป:
+  - API route ถูก mount ใน `app.main` แล้ว และ route shell ใช้ seed member data สำหรับการทดสอบ/เรียกใช้งานได้โดยไม่ล้ม
+
+## 2026-11-13 14:20 คำสั่ง: /implement T-04 specs/005-borrow-return/tasks.md
+
+- เครื่องมือ: Copilot ใน Codespaces
+- โหมด: implement
+- ไฟล์: `backend/app/api/loans.py`, `backend/app/services/loan_service.py`, `backend/app/repositories/loan_repository.py`, `backend/app/services/notification_service.py`, `backend/app/config.py`, `backend/tests/test_AC_LNS_01_loan_success_and_reminder.py`
+
+## 2026-11-13 15:10 คำสั่ง: /testcases AC-LNS-01 specs/005-borrow-return/
+
+- เครื่องมือ: Copilot ใน Codespaces
+- โหมด: ร่าง (ยังไม่มี `test-cases.md` ในโฟลเดอร์ฟีเจอร์)
+- ไฟล์: `specs/005-borrow-return/test-cases.md`
+- ผลลัพธ์: สร้างตาราง test case ร่าง 3 แถวสำหรับ AC-LNS-01 ตาม spec.md, plan.md, mockups/UI-LNS-01-borrow.html และ FR-LNS-02/FR-LNS-03/FR-LNS-04 โดยยังไม่เขียนโค้ด test
+- สรุป:
+  - path ที่ระบุเป็น `specs/005-borrow-return/` ถูกใช้ตามโครงสร้างที่มีอยู่และตรงกับฟีเจอร์ยืม-คืนหนังสือ
+  - เนื่องจากยังไม่มีแถวในตารางที่มีสถานะ "ใช้ได้" จึงจัดเป็นโหมดร่างและหยุดก่อนเขียนโค้ดทดสอบ
+  - แถวที่เพิ่มครอบคลุมทางปกติ/ขอบ/ทางผิด โดยอ้างจาก FR-LNS-02, FR-LNS-03, FR-LNS-04, ASM-02 และ mockup UI-LNS-01 โดยไม่เดาเกินขอบเขต
+
+ข้อความที่ต้องตรวจต่อโดยทีม: "ตรวจแถวในตาราง แก้ได้ตามต้องการ แล้วเปลี่ยนสถานะเป็น 'ใช้ได้' ก่อน จากนั้นสั่ง /testcases อีกครั้ง"
+
+## 2026-11-13 15:28 คำสั่ง: /testcases AC-LNS-02 specs/005-borrow-return/
+
+- เครื่องมือ: Copilot ใน Codespaces
+- โหมด: ร่าง
+- ไฟล์: `specs/005-borrow-return/test-cases.md`
+- ผลลัพธ์: เพิ่มแถว test case ร่าง 3 แถวสำหรับ AC-LNS-02 ตาม FR-LNS-04 และ spec.md โดยยังไม่เขียนโค้ด test
+- สรุป:
+  - ไฟล์มีแถว AC-LNS-01 อยู่แล้ว แต่ AC-LNS-02 ยังไม่มีแถวใดในตาราง
+  - จึงจัดเป็นโหมดร่างและหยุดก่อนเขียนโค้ดทดสอบ
+  - แถวที่เพิ่มครอบคลุมทางปกติ/ขอบ/ทางผิด โดยยึดจากเงื่อนไข “ยืมครบตามสิทธิ์” และ “หนังสือถูกยืมอยู่แล้ว” ตาม FR-LNS-04 และ AC-LNS-02 โดยไม่เดาเกินขอบเขต
+
+ข้อความที่ต้องตรวจต่อโดยทีม: "ตรวจแถวในตาราง แก้ได้ตามต้องการ แล้วเปลี่ยนสถานะเป็น 'ใช้ได้' ก่อน จากนั้นสั่ง /testcases อีกครั้ง"
+
+## 2026-11-13 15:42 คำสั่ง: /testcases AC-LNS-03 specs/005-borrow-return/
+
+- เครื่องมือ: Copilot ใน Codespaces
+- โหมด: ร่าง
+- ไฟล์: `specs/005-borrow-return/test-cases.md`
+- ผลลัพธ์: เพิ่มแถว test case ร่าง 3 แถวสำหรับ AC-LNS-03 ตาม FR-LNS-05, FR-LNS-06 และ AC-LNS-03 โดยยังไม่เขียนโค้ด test
+- สรุป:
+  - AC-LNS-03 ยังไม่มีแถวที่มีสถานะ "ใช้ได้" ในตาราง จึงจัดเป็นโหมดร่างและหยุดก่อนเขียนโค้ดทดสอบ
+  - แถวที่เพิ่มครอบคลุมทางปกติ/ขอบ/ทางผิด และอ้างจาก FR-LNS-05, FR-LNS-06, ASM-03 ใน spec.md
+  - ส่วนที่อาจยังไม่ชัดเจนใน spec คือ ข้อความแจ้งเหตุผลเมื่อคืนหนังสือไม่มีรายการยืมที่เปิดอยู่ เพราะ spec ระบุว่าส่ง “เหตุผล” แต่ไม่ได้กำหนดข้อความเฉพาะ จึงคงเป็น “spec ไม่ได้บอก” ใน Then ของกรณีทางผิด
+
+ข้อความที่ต้องตรวจต่อโดยทีม: "ตรวจแถวในตาราง แก้ได้ตามต้องการ แล้วเปลี่ยนสถานะเป็น 'ใช้ได้' ก่อน จากนั้นสั่ง /testcases อีกครั้ง"
+
+## 2026-11-13 15:48 คำสั่ง: /testcases AC-LNS-04 specs/005-borrow-return/
+
+- เครื่องมือ: Copilot ใน Codespaces
+- โหมด: ร่าง
+- ไฟล์: `specs/005-borrow-return/test-cases.md`
+- ผลลัพธ์: เพิ่มแถว test case ร่าง 3 แถวสำหรับ AC-LNS-04 ตาม FR-LNS-07 และ AC-LNS-04 โดยยังไม่เขียนโค้ด test
+- สรุป:
+  - AC-LNS-04 ยังไม่มีแถวที่มีสถานะ "ใช้ได้" ในตาราง จึงจัดเป็นโหมดร่างและหยุดก่อนเขียนโค้ดทดสอบ
+  - แถวที่เพิ่มครอบคลุมทางปกติ/ขอบ/ทางผิด และอ้างจาก FR-LNS-07, AC-LNS-04, T-08/T-09 ใน tasks.md
+  - สำหรับกรณีไม่มีประวัติหรือรหัสสมาชิกไม่มีประวัติ spec ไม่ได้ระบุข้อความเฉพาะ จึงคงเป็น “spec ไม่ได้บอก” ใน Then ของกรณีทางผิด
+
+ข้อความที่ต้องตรวจต่อโดยทีม: "ตรวจแถวในตาราง แก้ได้ตามต้องการ แล้วเปลี่ยนสถานะเป็น 'ใช้ได้' ก่อน จากนั้นสั่ง /testcases อีกครั้ง"
+- ผลลัพธ์: สร้าง API ยืมหนังสือจริงที่ตรวจสิทธิ์ก่อนบันทึก `LoanRecord`, บันทึก `due_date`, จัดตารางการแจ้งเตือนล่วงหน้า 1–3 วันผ่าน `NotificationLog`, และคืน `400` พร้อมเหตุผลที่ชัดเจนเมื่อหนังสือถูกยืมอยู่หรือยืมครบโควตา
+- การทดสอบ:
+  - `cd /workspaces/M_AllNew/backend && pytest tests/test_LNS_T01_loan_schema.py tests/test_LNS_T02_loan_validation.py tests/test_AC_LNS_01_loan_success_and_reminder.py -q` → ผ่าน 4/4
+- สิ่งที่เกือบต้องเดาแต่ถามแทน: ไม่มี; เราใช้ `DEFAULT_MAX_BOOKS_PER_MEMBER` จาก config และ `LOAN_REMINDER_DAYS_BEFORE_DUE` จาก `config.py` เพื่อหลีกเลี่ยงการฝังค่าคงที่แบบ hardcode ตามข้อกำหนดของ repo
+- สรุป:
+  - `LoanService.borrow_book` บันทึกการยืมและติดป้าย `approved` เมื่อผ่านเงื่อนไข
+  - `NotificationService.schedule_due_reminders` สร้าง notification รายการทุกรูปแบบ `email` และ `in_app` สำหรับช่วงล่วงหน้า 1–3 วัน
+  - `LoanRepository` รักษา state ในหน่วยความจำเพื่อให้ API และ test สามารถตรวจ route, denial, และ reminder ได้แบบ end-to-end
 - สรุป:
   - ระบบยืนยันว่าการอ่านข้อมูลไม่ได้จะไม่บันทึกการเข้าใช้บริการและยึดตาม FR-ACC-04 / IF-STD-02 อย่างเคร่งครัด
 
+## 2026-11-13 17:10 คำสั่ง: /implement T-06 specs/005-borrow-return/tasks.md
+
+- เครื่องมือ: Copilot ใน Codespaces
+- โหมด: implement
+- ไฟล์: `backend/app/api/loans.py`, `backend/app/services/loan_service.py`, `backend/app/repositories/loan_repository.py`, `backend/tests/test_AC_LNS_03_return_overdue_and_fine_shown.py`
+- ผลลัพธ์: สร้าง API คืนหนังสือจริงที่ตรวจรายการยืมที่เปิดอยู่, คำนวณ `overdue_days` และ `penalty_amount` จากวันที่ครบกำหนด, ปรับสถานะหนังสือให้ว่างหลังคืนสำเร็จ, และบันทึก `ReturnAuditLog` เพื่อให้เจ้าหน้าที่ตรวจสอบได้
+- การทดสอบ:
+  - `cd /workspaces/M_AllNew/backend && pytest tests/test_LNS_T01_loan_schema.py tests/test_LNS_T02_loan_validation.py tests/test_AC_LNS_01_loan_success_and_reminder.py tests/test_AC_LNS_03_return_overdue_and_fine_shown.py -q` → ผ่าน 5/5
+- สิ่งที่เกือบต้องเดาแต่ถามแทน: ไม่มี; เราใช้ค่าเดิมจาก `app.config.py` สำหรับอัตราค่าปรับ 3 บาท/วัน และ 20 บาท/วัน และไม่เพิ่มนโยบายใหม่ที่ไม่ระบุใน spec
+- สรุป:
+  - `LoanService.return_book` คำนวณค่าปรับตามจำนวนวันเกินกำหนดและบันทึก `ReturnAuditLog` พร้อม `processed_at`
+  - `LoanRepository` รักษา `return_audit_logs` และ `find_active_loan` เพื่อเปิดใช้งาน route คืนจริงได้ถูกต้อง
+  - `POST /api/loans/return` เรียกผ่าน `TestClient` ผ่านตาม AC-LNS-03 โดยส่งคืน `loan_id`, `return_status`, `overdue_days`, `penalty_amount`, `message`, และ `audit_log`
+
+## 2026-11-13 19:45 คำสั่ง: /implement T-08 specs/005-borrow-return/tasks.md
+
+- เครื่องมือ: Copilot ใน Codespaces
+- โหมด: implement
+- ไฟล์: `backend/app/api/loans.py`, `backend/app/services/loan_service.py`, `backend/app/repositories/loan_repository.py`, `backend/tests/test_AC_LNS_04_member_history_view.py`
+- ผลลัพธ์: เปลี่ยน route history จาก mock data เป็นข้อมูลจริงจาก repository ของสมาชิกที่ร้องขอ, เพิ่ม method `member_history()` และ `loan_history_for_member()` ที่คืนรายการยืมคืนพร้อม `borrow_date`, `due_date`, `return_date`, `status`, `overdue_days`, และ `penalty_amount`
+- การทดสอบ:
+  - `cd /workspaces/M_AllNew/backend && pytest tests/test_AC_LNS_03_return_overdue_and_fine_shown.py tests/test_AC_LNS_04_member_history_view.py -q` → ผ่าน 2/2
+- สิ่งที่เกือบต้องเดาแต่ถามแทน: ไม่มี; requirement ระบุชัดว่าต้องส่งคืนประวัติยืม-คืนของสมาชิกจาก state จริงภายใต้ FR-LNS-07 และ plan ระบุว่า output ต้องประกอบด้วย borrow date / due date / return date / status / penalty
+- สรุป:
+  - `GET /api/loans/history/{member_id}` คืน `member_id` และ `history` ที่มาจาก `LoanRepository.loan_records` อย่างแท้จริง แทน mock list ที่ hardcoded ไว้ก่อนหน้า
+  - `LoanService.member_history` เป็น layer กลางที่แปลงข้อมูล raw ให้ตรงกับ contract ของ API โดยไม่ละเมิด spec
+  - กรณีไม่มีข้อมูลหรือ member_id ว่างจะคืน `[]` สำหรับ history และ `404` เมื่อ member ไม่พบตาม validation ที่มีอยู่แล้ว
+
+## 2026-11-13 20:20 คำสั่ง: /implement T-09 specs/005-borrow-return/tasks.md
+
+- เครื่องมือ: Copilot ใน Codespaces
+- โหมด: implement
+- ไฟล์: `frontend/src/pages/LoanHistoryPage.jsx`, `frontend/src/api/client.js`, `frontend/src/App.jsx`, `frontend/src/__tests__/test_AC_LNS_04_member_history_view.jsx`
+- ผลลัพธ์: สร้างหน้าแสดงประวัติการยืม-คืนของสมาชิกตาม mockup, เพิ่ม client method `getLoanHistory()`, และเพิ่มเมนู `ประวัติการยืม-คืน` ในแอปหลัก เพื่อรองรับ FR-LNS-07 และ AC-LNS-04
+- การทดสอบ:
+  - `cd /workspaces/M_AllNew/frontend && npm test -- --run src/__tests__/test_AC_LNS_04_member_history_view.jsx --reporter=basic` → ผ่าน 1/1
+- สิ่งที่เกือบต้องเดาแต่ถามแทน: ไม่มี; mockup และ requirement ชัดเจนว่าหน้าประวัติต้องแสดงสถานะ `คืนแล้ว`, `ยังไม่คืน`, และ `ค่าปรับ X บาท` เท่านั้น ดังนั้นไม่เพิ่มฟีเจอร์ใด ๆ นอกเหนือจาก UI/history rendering
+- สรุป:
+  - หน้า UI ดึงข้อมูลจาก `/api/loans/history/{memberId}` และแสดงประวัติแบบรายการพร้อมวันที่/สถานะ/ค่าปรับ
+  - กรณีมีคืนเกินกำหนด จะแสดง badge เป็น `ค่าปรับ X บาท` ตาม mockup และกรณียังไม่คืนจะแสดง `ยังไม่คืน`
+  - การเลือกเมนูใน App ทำให้ผู้ใช้เข้าถึงหน้าได้ตรงตาม requirement ของ T-09 โดยไม่แตะ task อื่น
 
 ## 2026-11-12 06:20 คำสั่ง: /testcases AC-SRC-01 specs/003-searchBook/
 
@@ -246,6 +367,53 @@
   - เหตุที่ไม่ถือว่าเป็น code defect คือปัญหาเหล่านี้เป็นข้อมูล/ความชัดเจนของ requirement อย่างชัดเจน กว่าเป็น logic bug
 - ข้อสั่งต่อ: หากทีมต้องการยืนยันข้อค้นพบนี้จริง ให้จัดทำ Q-xx หรือปรับ spec ให้ระบุว่า Search Book ใช้ mock seed data หรือ central DB จริงในสภาพแวดล้อม deployment
 - การกระทำ: จำกัดการแก้ไขเฉพาะ RTM ใน feature นี้เท่านั้น; ไม่แตะโค้ด production
+
+---
+
+## 2026-11-13 12:00 คำสั่ง: /tasks specs/005-borrow-return/
+
+- เครื่องมือ: Copilot ใน Codespaces
+- โหมด: แตก plan.md เป็น tasks.md
+- ไฟล์: specs/005-borrow-return/spec.md, plan.md, tasks.md
+- ผลลัพธ์: สร้างไฟล์ `specs/005-borrow-return/tasks.md` ด้วยการแยกงานเป็น 4 เฟส และ 9 task ตามแนว vertical slice โดยไม่ได้เริ่มโค้ด production
+- สรุป:
+  - จำนวนเฟส: 4 (เฟส 0 ฐานราก + เฟส 1-3 ตามกระบวนการยืม → คืน → ประวัติ)
+  - จำนวน task ทั้งหมด: 9 task
+  - จำนวน task ที่ "รอ Q-xx": 0 task
+  - เฟสแรกที่ลองใช้งานได้จริง: เฟส 1 (ยืมหนังสือสำเร็จและปฏิเสธเมื่อเกินโควตา)
+- task ที่คิดว่ายากที่สุด: T-06 (สร้าง API คืนหนังสือและคำนวณค่าปรับ) เพราะต้องเชื่อมความสมบูรณ์ของ business rule, audit log, และ UI response พร้อมกัน โดยต้องคำนึงถึงโครงสร้างข้อมูลของ `LoanRecord` และ `ReturnAuditLog` ให้ตรงตาม spec
+- AC ที่ทดสอบยากที่สุด: AC-LNS-03 เพราะต้องจำลองวันที่เกินกำหนดจริง, คำนวณค่าปรับตามประเภทหนังสือ, และตรวจว่า audit log ถูกบันทึกทันทีหลังคืนสำเร็จ; ทีมควรใช้ข้อมูลตัวอย่างที่มีหนังสือเกินกำหนด 4 วันและเรียก `POST /api/loans/return` แล้วตรวจ `overdue_days`, `penalty_amount`, และ response message พร้อมกัน
+- ข้อสั่งต่อ: ทีมตรวจความครบของ tasks.md แล้วให้ยืนยันว่าเป็นไปตาม spec และ plan ก่อนเริ่ม implement ต่อ
+
+---
+
+## 2026-11-13 12:45 คำสั่ง: /implement T-01 specs/005-borrow-return/tasks.md
+
+- เครื่องมือ: Copilot ใน Codespaces
+- โหมด: implement
+- ไฟล์: backend/app/config.py, backend/app/models/book_copy.py, backend/app/models/loan_record.py, backend/app/models/notification_log.py, backend/app/models/return_audit_log.py, backend/tests/test_LNS_T01_loan_schema.py
+- ผลลัพธ์: สร้าง schema สำหรับกระบวนการยืม-คืนและบันทึกข้อมูลระดับแรกเริ่มตาม plan และ spec รวมถึงค่าแจ้งเตือนล่วงหน้าและค่าปรับที่เก็บใน config
+- การทดสอบ:
+  - `cd /workspaces/M_AllNew/backend && pytest tests/test_LNS_T01_loan_schema.py -q` → 1 passed, 1 warning
+- สิ่งที่เกือบต้องเดาแต่ถามแทน: ไม่มี; spec และ plan ระบุชัดเจนว่า task นี้เป็นงานฐานรากสำหรับ schema และสเตจที่ต้องมีฟิลด์ `status`, `due_date`, `return_time`, `overdue_days`, `penalty_amount`, `NotificationLog`, และ `ReturnAuditLog`
+- สรุป:
+  - model ที่เพิ่มให้ตรงกับ FR-LNS-01, FR-LNS-02, FR-LNS-05, FR-LNS-06 และ CON-LNS-01, CON-LNS-02
+  - `LOAN_REMINDER_DAYS_BEFORE_DUE`, `BOOK_GENERAL_PENALTY_PER_DAY_BAHT`, `BOOK_SPECIAL_PENALTY_PER_DAY_BAHT` ถูกจัดเก็บไว้ใน `backend/app/config.py` เพื่อให้มีกฎเดียวสำหรับการคำนวณและการแจ้งเตือน
+
+---
+
+## 2026-11-13 13:05 คำสั่ง: /implement T-02 specs/005-borrow-return/tasks.md
+
+- เครื่องมือ: Copilot ใน Codespaces
+- โหมด: implement
+- ไฟล์: backend/app/repositories/loan_repository.py, backend/app/services/loan_service.py, backend/tests/test_LNS_T02_loan_validation.py
+- ผลลัพธ์: สร้าง service ตรวจสิทธิ์ยืมที่คืนค่า `allowed`, `status`, และ `message` เพื่อให้ UI/API แยกกรณี "หนังสือถูกยืมอยู่แล้ว" และ "ยืมครบโควตา" ได้ชัดเจน
+- การทดสอบ:
+  - `cd /workspaces/M_AllNew/backend && pytest tests/test_LNS_T02_loan_validation.py -q` → 1 passed, 1 warning
+- สิ่งที่เกือบต้องเดาแต่ถามแทน: ไม่มี; เราใช้พารามิเตอร์ `max_books_per_member` จากการเรียก service แทนการเดาเลขโควตาเนื่องจาก spec ไม่ระบุค่าที่แน่นอนและสรุปไว้ใน `ASM-01` ว่าควรกำหนดตามนโยบายจริงของห้องสมุด
+- สรุป:
+  - `LoanRepository` ตรวจสถานะ `copy_is_borrowed` และนับจำนวนยืมที่ยังเปิดอยู่ด้วย `member_active_loan_count`
+  - `LoanService.validate_loan` คืนค่า `copy_unavailable` และ `borrow_limit_exceeded` เพื่อให้ API/หน้าจอใช้งานต่อได้โดยไม่ต้องเดาเงื่อนไขที่ซ่อนอยู่
 
 ---
 
@@ -450,6 +618,22 @@
 - ไฟล์ที่สร้าง/แก้: backend/app/api/books.py, backend/app/services/book_detail_service.py, backend/app/main.py, backend/tests/test_AC_SRC_04_book_detail_fields.py
 - สรุปงาน: สร้าง API GET /api/books/{title_id} เพื่อคืนรายละเอียดหนังสือแบบ per-copy จากชุดข้อมูล Central DB ตัวอย่าง โดยมี title, authors, isbn, call_number, category, copies, และ aggregated availability; route ถูกติดตั้งใน FastAPI app และคืน 404 เมื่อไม่พบ title_id
 - ผล test: `cd /workspaces/M_AllNew/backend && . ../.venv/bin/activate && pytest -q tests` → 8 passed, exit code 0
+
+## 2026-11-13 05:45 คำสั่ง: /verify specs/005-borrow-return/
+
+- เครื่องมือ: Copilot ใน Codespaces
+- โหมด: ตรวจ requirement และตามรอย requirement → code → test
+- ไฟล์: `specs/005-borrow-return/spec.md`, `tasks.md`, `plan.md`, `test-cases.md`, `rtm.md`
+- ผลลัพธ์: ตรวจความสอดคล้องของ feature ยืม-คืนหนังสือแบบ scoped-to-feature โดยยึด spec และ implementation ที่มีอยู่จริง
+- การตรวจสอบเชิงประสิทธิภาพ:
+  - Backend: `cd /workspaces/M_AllNew/backend && pytest tests/test_AC_LNS_01_loan_success_and_reminder.py tests/test_AC_LNS_03_return_overdue_and_fine_shown.py tests/test_AC_LNS_04_member_history_view.py -q` → 4 passed, 1 warning, exit code 0
+  - Frontend: `cd /workspaces/M_AllNew/frontend && npm test -- --run src/__tests__/LoanKioskPage.test.jsx src/__tests__/ReturnKioskPage.test.jsx src/__tests__/test_AC_LNS_04_member_history_view.test.jsx --reporter=basic` → 3 files passed, 4 tests passed, exit code 0
+- สรุป:
+  - FR-LNS-01 ถึง FR-LNS-07 และ AC-LNS-01 ถึง AC-LNS-04 มี implementation ที่สอดคล้องกับ spec และผ่าน feature-specific tests ที่มีอยู่จริง
+  - ความแตกต่างที่พบในห้องปฏิบัติการ verification คือมี feature test ที่ไม่ได้เรียกชื่อนี้ตรงกัน (ตัวอย่าง: ไม่มี `test_AC_LNS_02_loan_denied_when_limit_exceeded.py` ใน repo) จึงใช้ไฟล์ test ที่มีอยู่จริงในการยืนยันแทน ไม่ได้เพิ่มหรือแก้ไข production code
+  - ข้อค้นพบสำคัญที่ยังคงเป็น requirement gap: มีความขัดกันระหว่าง FR-LNS-06 กับข้อกำหนดว่า “ค่าปรับเป็น Out of scope” ในระดับบางส่วนของ spec, และ NFR ที่ไม่มี AC หรือ test coverage ครอบคลุมยังเป็นเรื่องที่ทีมควรตัดสินในระดับ requirement ต่อไป
+- ข้อสั่งต่อ: ทีมเปิดอ่าน [specs/005-borrow-return/rtm.md](specs/005-borrow-return/rtm.md) และยืนยันข้อค้นพบในช่อง “ทีมตัดสิน” ด้วยตนเองก่อนปิด feature นี้
+- การกระทำ: จำกัดการแก้ไขเฉพาะเอกสาร RTM และ prompt log เท่านั้น ตามกติกา /verify; ไม่แตะ production code และไม่แตะ test file ภายใต้โหมด verify
 - สิ่งที่เกือบต้องเดาแต่ถามแทน: ไม่มี; spec ระบุชัดเจนว่า AC-SRC-04 ต้องมีชื่อ ผู้แต่ง เลขเรียกหนังสือ/ISBN หมวดหมู่ สถานะยืม-คืน และตำแหน่งจัดเก็บ และโครงสร้างข้อมูลมีอยู่แล้วใน model/book.py และ config.py
 
 ## 2026-11-12 19:45 คำสั่ง: /implement T-11

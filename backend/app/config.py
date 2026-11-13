@@ -1,6 +1,19 @@
 # FR-SRC-01, FR-SRC-02, FR-SRC-03, IF-CAT-01
 # ตัวเลขและกฎที่มาจาก spec จัดเก็บไว้ที่นี่เพื่อให้ reuse กับ API และ UI ต่อไป
 
+# FR-LNS-03, ASM-02: แจ้งเตือนล่วงหน้า 1–3 วันก่อนกำหนดคืน
+LOAN_REMINDER_DAYS_BEFORE_DUE = (1, 3)
+
+# FR-LNS-01, ASM-01: จำนวนหนังสือสูงสุดที่ยืมได้ต่อคน (ทีมเลือกเอง ไม่ได้มาจาก spec)
+DEFAULT_MAX_BOOKS_PER_MEMBER = 2
+
+# FR-LNS-01, FR-LNS-03: ระยะเวลายืมหนังสือเริ่มต้น (ทีมเลือกเอง ไม่ได้มาจาก spec)
+LOAN_DUE_DAYS = 14
+
+# FR-LNS-06, ASM-03: อัตราค่าปรับตามประเภทหนังสือ 3 บาท/วัน และ 20 บาท/วัน
+BOOK_GENERAL_PENALTY_PER_DAY_BAHT = 3
+BOOK_SPECIAL_PENALTY_PER_DAY_BAHT = 20
+
 SEARCH_PAGE_SIZE_MIN = 20
 SEARCH_PAGE_SIZE_MAX = 25
 

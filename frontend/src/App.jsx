@@ -3,7 +3,10 @@ import { useState } from 'react'
 import AccessKioskPage from './pages/AccessKioskPage.jsx'
 import BookDetailPage from './pages/BookDetailPage.jsx'
 import EquipmentLoanPage from './pages/EquipmentLoanPage.jsx'
+import LoanHistoryPage from './pages/LoanHistoryPage.jsx'
+import LoanKioskPage from './pages/LoanKioskPage.jsx'
 import PrintPage from './pages/PrintPage.jsx'
+import ReturnKioskPage from './pages/ReturnKioskPage.jsx'
 import SearchPage from './pages/SearchPage.jsx'
 import SpaceBookingPage from './pages/SpaceBookingPage.jsx'
 import StaffLoanApprovalPage from './pages/StaffLoanApprovalPage.jsx'
@@ -16,6 +19,9 @@ import StaffLoanApprovalPage from './pages/StaffLoanApprovalPage.jsx'
 // แต่ละฟีเจอร์เพิ่มเมนูของตัวเอง 1 แถวใน MENUS และ 1 กรณีใน renderPage
 const MENUS = [
   { key: 'books', label: 'หนังสือ' },
+  { key: 'loan-kiosk', label: 'ยืมหนังสือ' },
+  { key: 'return-kiosk', label: 'คืนหนังสือ' },
+  { key: 'loan-history', label: 'ประวัติการยืม-คืน' },
   { key: 'access', label: 'เข้าห้องสมุด' },
   { key: 'space-booking', label: 'จองพื้นที่' },
   { key: 'printing', label: 'ปริ้นเอกสาร' },
@@ -35,12 +41,18 @@ function BooksSection() {
 
 function renderPage(menuKey) {
   switch (menuKey) {
+    case 'loan-kiosk':
+      return <LoanKioskPage />
+    case 'return-kiosk':
+      return <ReturnKioskPage />
+    case 'loan-history':
+      return <LoanHistoryPage />
     case 'access':
       return <AccessKioskPage />
     case 'space-booking':
       return <SpaceBookingPage />
     case 'printing':
-      return <PrintPage />
+      return <PrintPage demoMode />
     case 'equipment':
       return <EquipmentLoanPage />
     case 'equipment-staff':

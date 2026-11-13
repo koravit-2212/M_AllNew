@@ -35,6 +35,16 @@ async function chooseFile(name = 'report.pdf', size = 1258291, type = 'applicati
 }
 
 describe('AC-PRT-01 เห็นตัวเลือกการพิมพ์และค่าใช้บริการก่อนยืนยัน', () => {
+  it('เปิดหน้าแบบ demo mode จะโหลดค่าเริ่มต้นสำหรับทดสอบพิมพ์ให้พร้อมใช้งาน', async () => {
+    const client = makeClient()
+    render(<PrintPage client={client} demoMode />)
+
+    expect(await screen.findByText('demo-print-test.pdf (2.0 MB)')).toBeTruthy()
+    await waitFor(() => expect(screen.getByLabelText('จำนวนหน้า').value).toBe('1'))
+    await waitFor(() => expect(screen.getByLabelText('จำนวนชุด').value).toBe('1'))
+    await waitFor(() => expect(screen.getByLabelText('ขาว-ดำ').checked).toBe(true))
+  })
+
   it('AC-PRT-01 เลือกไฟล์ กรอก 12 หน้า 2 ชุด แล้วเห็นบรรทัดคำนวณและค่าใช้บริการ', async () => {
     // Given นักศึกษาเลือกไฟล์ที่รองรับ
     const client = makeClient()

@@ -157,6 +157,47 @@ export const api = {
     return res.json()
   },
   // FR-ACC-01, FR-ACC-04, FR-ACC-05, CON-SEC-01: scan flow ของ kiosk ที่เรียก API หลังบ้านผ่าน HTTPS
+  async borrowBook({ memberId, barcode, source = 'counter' }) {
+    const res = await fetch(`${BASE}/loans/borrow`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ member_id: memberId, barcode, source }),
+    })
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}))
+      const error = new Error(`Borrow request failed: ${res.status}`)
+      error.status = res.status
+      error.detail = body?.detail ?? body?.message ?? 'ไม่สามารถยืมได้'
+      throw error
+    }
+    return res.json()
+  },
+  async returnBook({ memberId, barcode }) {
+    const res = await fetch(`${BASE}/loans/return`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ member_id: memberId, barcode }),
+    })
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}))
+      const error = new Error(`Return request failed: ${res.status}`)
+      error.status = res.status
+      error.detail = body?.detail ?? body?.message ?? 'ไม่สามารถคืนหนังสือได้'
+      throw error
+    }
+    return res.json()
+  },
+  async getLoanHistory({ memberId }) {
+    const res = await fetch(`${BASE}/loans/history/${encodeURIComponent(memberId)}`)
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}))
+      const error = new Error(`Loan history request failed: ${res.status}`)
+      error.status = res.status
+      error.detail = body?.detail ?? body?.message ?? 'ไม่สามารถโหลดประวัติการยืม-คืนได้'
+      throw error
+    }
+    return res.json()
+  },
   async scanAccess({ scanMethod, qrCodeOrCardId }) {
     const res = await fetch(`${BASE}/access/scan`, {
       method: 'POST',

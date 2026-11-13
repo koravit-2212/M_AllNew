@@ -62,3 +62,86 @@ def access_status_for_member(member_id: str) -> str:
     if profile.eligibility_status == 'verification_failed':
         return 'verification_failed'
     return 'eligible'
+
+
+# ---------------------------------------------------------------------------
+# 005-borrow-return: loan seed data and route shell
+# ---------------------------------------------------------------------------
+
+@dataclass
+class LoanMemberProfile:
+    """FR-LNS-01, FR-LNS-02, FR-LNS-07: ข้อมูลสมาชิกที่ใช้ใน workflow ยืม-คืน"""
+
+    member_id: str
+    member_type: str
+    name: str
+    email: str | None = None
+
+
+LOAN_MEMBER_SEED_DATA = [
+    {
+        'member_id': 'STD-1001',
+        'member_type': 'student',
+        'name': 'นักศึกษาตัวอย่าง ก',
+        'email': 'student.a@example.edu',
+    },
+    {
+        'member_id': 'STF-2001',
+        'member_type': 'staff',
+        'name': 'บุคลากรตัวอย่าง',
+        'email': 'staff@example.edu',
+    },
+    {
+        'member_id': 'STD-1002',
+        'member_type': 'student',
+        'name': 'นักศึกษาตัวอย่าง ข',
+        'email': 'student.b@example.edu',
+    },
+]
+
+
+def build_loan_member_profiles() -> dict[str, LoanMemberProfile]:
+    """FR-LNS-01, FR-LNS-07: สร้างรูปแบบสมาชิกสำหรับ seed data ในงานยืม-คืน"""
+
+    return {
+        payload['member_id']: LoanMemberProfile(
+            member_id=payload['member_id'],
+            member_type=payload['member_type'],
+            name=payload['name'],
+            email=payload.get('email'),
+        )
+        for payload in LOAN_MEMBER_SEED_DATA
+    }
+
+
+def find_loan_member(member_id: str) -> LoanMemberProfile | None:
+    """FR-LNS-01, FR-LNS-07: คืนสมาชิกจาก seed data สำหรับ API shell"""
+
+    return build_loan_member_profiles().get(member_id)
+
+
+def loan_history_for_member(member_id: str) -> list[dict]:
+    """FR-LNS-07: history ตัวอย่างสำหรับการทดสอบและ mock API ของผู้ยืม"""
+
+    if member_id == 'STD-1001':
+        return [
+            {
+                'loan_id': 'loan-001',
+                'copy_id': 'CC-001',
+                'borrow_date': '2026-11-12',
+                'due_date': '2026-11-19',
+                'return_date': '2026-11-19',
+                'status': 'returned',
+                'penalty_amount': 0,
+            },
+            {
+                'loan_id': 'loan-002',
+                'copy_id': 'CC-002',
+                'borrow_date': '2026-11-20',
+                'due_date': '2026-11-27',
+                'return_date': None,
+                'status': 'borrowed',
+                'penalty_amount': 0,
+            },
+        ]
+    return []

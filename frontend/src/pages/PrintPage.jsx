@@ -47,7 +47,7 @@ function toPositiveInt(value) {
   return Number.isInteger(n) && n >= 1 ? n : null
 }
 
-export default function PrintPage({ client = api }) {
+export default function PrintPage({ client = api, demoMode = false }) {
   const [file, setFile] = useState(null)
   const [colorMode, setColorMode] = useState('BW')
   const [pagesInput, setPagesInput] = useState('1')
@@ -69,6 +69,10 @@ export default function PrintPage({ client = api }) {
   const chooseFile = async (event) => {
     const picked = event.target.files?.[0]
     if (!picked) return
+    if (typeof client?.uploadPrintFile !== 'function') {
+      setFile(null)
+      return
+    }
     setOptions(null)
     setRejectedFile(null)
     try {
@@ -86,9 +90,52 @@ export default function PrintPage({ client = api }) {
     }
   }
 
+  useEffect(() => {
+    if (!demoMode || file) return undefined
+
+    let active = true
+    const demoFile = new File(['demo print test content'], 'demo-print-test.pdf', { type: 'application/pdf' })
+    Object.defineProperty(demoFile, 'size', { value: 2 * 1024 * 1024 })
+
+    const loadDemo = async () => {
+      if (typeof client?.uploadPrintFile !== 'function') {
+        if (active) {
+          setFile({ id: 'demo-file', name: demoFile.name, size: demoFile.size })
+        }
+        return
+      }
+      try {
+        const uploaded = await client.uploadPrintFile({
+          filename: demoFile.name,
+          contentType: demoFile.type,
+          sizeBytes: demoFile.size,
+        })
+        if (active) {
+          setFile({ id: uploaded.file_id, name: demoFile.name, size: demoFile.size })
+          setPagesInput('1')
+          setCopiesInput('1')
+          setColorMode('BW')
+        }
+      } catch (error) {
+        if (active) {
+          setFile({ id: 'demo-file', name: demoFile.name, size: demoFile.size })
+        }
+      }
+    }
+
+    void loadDemo()
+    return () => {
+      active = false
+    }
+  }, [client, demoMode, file])
+
   // FR-PRT-02: คำนวณค่าใช้บริการทุกครั้งที่เปลี่ยนตัวเลือก
   useEffect(() => {
     if (!file || !pages || !copies) {
+      setOptions(null)
+      return undefined
+    }
+    if (typeof client?.getPrintOptions !== 'function') {
       setOptions(null)
       return undefined
     }
@@ -104,7 +151,7 @@ export default function PrintPage({ client = api }) {
 
   // FR-PRT-03: ยืนยันการพิมพ์ ส่งงานไปเครื่องปริ้นและบันทึกการใช้บริการ
   const submit = async () => {
-    if (!file || !options) return
+    if (!file || !options || typeof client?.submitPrintJob !== 'function') return
     setSubmitting(true)
     setSubmitError(null)
     try {
