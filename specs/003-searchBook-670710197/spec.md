@@ -1,4 +1,4 @@
-# specs/003-searchBook/spec.md
+# specs/003-searchBook-670710197/spec.md
 # Feature: ค้นหาหนังสือ (Book Search)
 Spec ID: SPEC-SRC-001 | Source: Use Case Specification ระบบห้องสมุด, UC-03 | Use case: UC-03
 Owner: TBD | Status: Draft v2 | Updated: 2569-09-20

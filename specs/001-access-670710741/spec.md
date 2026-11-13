@@ -1,4 +1,4 @@
-# specs/001-access/spec.md
+# specs/001-access-670710741/spec.md
 # Feature: เข้าใช้บริการห้องสมุด (Access)
 Spec ID: SPEC-ACC-001 | Source: Use Case Specification ระบบห้องสมุด, UC-01 | Use case: UC-01
 Owner: TBD | Status: Draft v2 | Updated: 2569-09-19

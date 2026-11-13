@@ -1,4 +1,4 @@
-# specs/006-printing/spec.md
+# specs/006-printing-670710325/spec.md
 # Feature: ใช้บริการปริ้นเอกสาร (Printing)
 Spec ID: SPEC-PRT-001 | Source: Use Case Specification ระบบห้องสมุด, UC-06 | Use case: UC-06
 Owner: TBD | Status: Draft v3 | Updated: 2569-11-12

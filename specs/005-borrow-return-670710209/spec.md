@@ -1,4 +1,4 @@
-# specs/005-borrow-return/spec.md
+# specs/005-borrow-return-670710209/spec.md
 # Feature: ยืม-คืนหนังสือ (Book Loan / Return)
 Spec ID: SPEC-LNS-001 | Source: Use Case Specification ระบบห้องสมุด, UC-05 | Use case: UC-05
 Owner: TBD | Status: Draft v2 | Updated: 2569-09-20

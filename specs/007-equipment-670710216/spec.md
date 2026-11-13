@@ -1,4 +1,4 @@
-# specs/007-equipment/spec.md
+# specs/007-equipment-670710216/spec.md
 # Feature: ใช้บริการยืมอุปกรณ์ (Equipment Loan)
 Spec ID: SPEC-EQP-001 | Source: Use Case Specification ระบบห้องสมุด, UC-07 | Use case: UC-07
 Owner: TBD | Status: Draft v3 | Updated: 2569-11-12

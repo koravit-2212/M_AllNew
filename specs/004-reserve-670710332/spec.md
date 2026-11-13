@@ -1,4 +1,4 @@
-# specs/004-reserve/spec.md
+# specs/004-reserve-670710332/spec.md
 # Feature: จอง/ใช้พื้นที่ในห้องสมุด (Space Booking)
 Spec ID: SPEC-BKG-002 | Source: Use Case Specification ระบบห้องสมุด, UC-04 | Use case: UC-04
 Owner: TBD | Status: Draft v3 | Updated: 2569-11-12
